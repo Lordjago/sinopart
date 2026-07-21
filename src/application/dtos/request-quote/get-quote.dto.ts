@@ -7,7 +7,7 @@ import {
   IsString,
   Min,
 } from 'class-validator';
-import { PageDto } from 'src/application/dtos/page.dto';
+import { PageDto } from '../page.dto';
 
 export class GetQuoteDto extends PageDto {
   @IsOptional() @IsString() name?: string;

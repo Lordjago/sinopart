@@ -1,6 +1,6 @@
 import { Type } from 'class-transformer';
 import { IsDate } from 'class-validator';
-import { PageDto } from 'src/application/dtos/page.dto';
+import { PageDto } from '../page.dto';
 
 export class GetWaitListDto extends PageDto {
   email?: string;

@@ -1,4 +1,4 @@
-import { WaitList } from 'src/core/domain/entities/waitlist';
+import { WaitList } from '../../core/domain/entities/waitlist';
 
 export class WaitListMapper {
   static toDomain(document: any): WaitList | null {

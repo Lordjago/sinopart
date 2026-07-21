@@ -1,9 +1,9 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
-import { WaitListDto } from 'src/application/dtos/waitlist/waitlist.dto';
+import { WaitListDto } from '../../../application/dtos/waitlist/waitlist.dto';
 import { Public } from '../decorator/is-public.decorator';
-import { JoinWaitListUseCase } from 'src/core/usecase/waitlist/join-waitlist.usecase';
-import { GetWaitListUseCase } from 'src/core/usecase/waitlist/get-waitlist.usecase';
-import { GetWaitListDto } from 'src/application/dtos/waitlist/get-waitlist.dto';
+import { JoinWaitListUseCase } from '../../../core/usecase/waitlist/join-waitlist.usecase';
+import { GetWaitListUseCase } from '../../../core/usecase/waitlist/get-waitlist.usecase';
+import { GetWaitListDto } from '../../../application/dtos/waitlist/get-waitlist.dto';
 
 @Controller({
   path: 'waitlist',

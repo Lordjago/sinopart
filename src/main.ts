@@ -38,11 +38,11 @@ async function bootstrap() {
     type: VersioningType.URI,
     defaultVersion: '1',
   });
-  // await app.listen(port);
-  await app.listen(process.env.PORT ?? port, '0.0.0.0');
+  // 0.0.0.0, not localhost: hosts like Render probe the container's external
+  // interface, and a loopback-only bind looks like "port never opened".
+  await app.listen(port, '0.0.0.0');
 
-
-  console.log(`SinoPart backend listening on http://localhost:${port}`);
+  console.log(`SinoPart backend listening on port ${port}`);
 }
 
 bootstrap().catch((err) => {

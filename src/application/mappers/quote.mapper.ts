@@ -1,4 +1,4 @@
-import { Quote } from 'src/core/domain/entities/quote';
+import { Quote } from '../../core/domain/entities/quote';
 
 export class QuoteMapper {
   static toDomain(document: any): Quote | null {

@@ -47,15 +47,9 @@ import { QuoteSchema } from './mongoose/documents/quote.document';
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      // useFactory: (config: ConfigService) => ({
-      //   uri: config.getOrThrow<string>('MONGODB_URI'),
-      // }),
       useFactory: (config: ConfigService) => ({
-  uri: config.getOrThrow<string>('MONGODB_URI'),
-  maxPoolSize: 10,
-  serverSelectionTimeoutMS: 10000,
-}),
-
+        uri: config.getOrThrow<string>('MONGODB_URI'),
+      }),
     }),
     // Register the collections. The names ('users', 'cars') are the tokens the
     // repository adapters ask for with `@InjectModel(...)`.

@@ -32,12 +32,12 @@ async function bootstrap() {
   app.useGlobalInterceptors(new HttpResponseInterceptor());
   app.useGlobalFilters(new CustomExceptionFilter());
 
-  app.setGlobalPrefix('api'); // all routes are prefixed with /api
+  app.setGlobalPrefix('api');
 
-  app.enableVersioning({
-    type: VersioningType.URI,
-    defaultVersion: '1',
-  });
+  // app.enableVersioning({
+  //   type: VersioningType.URI,
+  //   defaultVersion: '1',
+  // });
   // 0.0.0.0, not localhost: hosts like Render probe the container's external
   // interface, and a loopback-only bind looks like "port never opened".
   await app.listen(port, '0.0.0.0');

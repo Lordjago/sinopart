@@ -10,9 +10,6 @@
  *   3. Bind each repository token to its implementation:
  *        { provide: USER_REPOSITORY, useClass: UserRepositoryImpl }
  *      and EXPORT the tokens so use cases (in CoreModule) can inject them.
- *
- * It imports ServiceModule because UsersSeeder hashes its demo password through
- * the AUTHENTICATION_SERVICE port.
  */
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -25,7 +22,6 @@ import {
   USER_REPOSITORY,
   WAITLIST_REPOSITORY,
 } from '../../core/injection.token';
-import { ServiceModule } from '../services/service.module';
 
 import { UserSchema } from './mongoose/documents/user.document';
 import { CarSchema } from './mongoose/documents/car.document';
@@ -35,8 +31,6 @@ import { UserRepositoryImpl } from './mongoose/repositories/user.repository.impl
 import { CarRepositoryImpl } from './mongoose/repositories/car.repository.impl';
 import { OtpRepositoryImpl } from './mongoose/repositories/otp.repository.impl';
 import { WaitListRepositoryImpl } from './mongoose/repositories/waitlist.repository.impl';
-import { UsersSeeder } from './mongoose/seeders/users.seeder';
-import { CatalogSeeder } from './mongoose/seeders/catalog.seeder';
 import { QuoteRepositoryImpl } from './mongoose/repositories/quote.repository.impl';
 import { QuoteSchema } from './mongoose/documents/quote.document';
 
@@ -60,7 +54,6 @@ import { QuoteSchema } from './mongoose/documents/quote.document';
       { name: 'waitlist', schema: WaitListSchema },
       { name: 'quotes', schema: QuoteSchema },
     ]),
-    ServiceModule,
   ],
   providers: [
     { provide: USER_REPOSITORY, useClass: UserRepositoryImpl },
@@ -68,8 +61,6 @@ import { QuoteSchema } from './mongoose/documents/quote.document';
     { provide: OTP_REPOSITORY, useClass: OtpRepositoryImpl },
     { provide: WAITLIST_REPOSITORY, useClass: WaitListRepositoryImpl },
     { provide: QUOTE_REPOSITORY, useClass: QuoteRepositoryImpl },
-    UsersSeeder,
-    CatalogSeeder,
   ],
   // Exporting the tokens (and MongooseModule) lets other modules depend on the
   // storage ports without knowing the concrete adapters.

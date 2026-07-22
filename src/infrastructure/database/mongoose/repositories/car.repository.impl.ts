@@ -36,12 +36,4 @@ export class CarRepositoryImpl implements CarRepository {
     const doc = await this.model.findOne({ slug }).exec();
     return CarMapper.toDomain(doc);
   }
-
-  async count(): Promise<number> {
-    return this.model.estimatedDocumentCount().exec();
-  }
-
-  async createMany(cars: Car[]): Promise<void> {
-    await this.model.insertMany(cars);
-  }
 }

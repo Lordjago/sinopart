@@ -109,14 +109,7 @@ export function quoteAdminTemplate(input: QuoteAlertInput): RenderedEmail {
           </td>
         </tr>
 
-        <!-- footer -->
-        <tr>
-          <td style="padding:24px 32px 30px;">
-            <div style="border-top:1px solid #E7DECF;padding-top:16px;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.6;color:#8B8278;">
-              Sent automatically from the SinoPart landing page &mdash; "Request a quote" section.
-            </div>
-          </td>
-        </tr>
+        
 
       </table>
 

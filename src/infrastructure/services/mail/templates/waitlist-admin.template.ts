@@ -19,7 +19,11 @@ import { escapeHtml, formatDateTime, type RenderedEmail } from './layout';
  * value is missing so optional fields (dealership, city, WhatsApp) drop out
  * instead of rendering an empty row.
  */
-function row(label: string, value: string | undefined, opts?: { mono?: boolean }): string {
+function row(
+  label: string,
+  value: string | undefined,
+  opts?: { mono?: boolean },
+): string {
   const text = value?.trim();
   if (!text) return '';
   const valueFont = opts?.mono
@@ -32,7 +36,9 @@ function row(label: string, value: string | undefined, opts?: { mono?: boolean }
     </tr>`;
 }
 
-export function waitListAdminTemplate(input: WaitListAlertInput): RenderedEmail {
+export function waitListAdminTemplate(
+  input: WaitListAlertInput,
+): RenderedEmail {
   const { email, name, dealership, whatsAppNumber, city, joinedAt } = input;
 
   // The design headlines who signed up. Prefer the name, fall back to the
@@ -140,14 +146,7 @@ export function waitListAdminTemplate(input: WaitListAlertInput): RenderedEmail 
           </td>
         </tr>
 
-        <!-- footer -->
-        <tr>
-          <td style="padding:24px 32px 30px;">
-            <div style="border-top:1px solid #E7DECF;padding-top:16px;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.6;color:#8B8278;">
-              Sent automatically from the SinoPart landing page &mdash; dealer waitlist.
-            </div>
-          </td>
-        </tr>
+        
 
       </table>
 

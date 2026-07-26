@@ -45,15 +45,8 @@ export function waitListWelcomeTemplate(
 
         <!-- header -->
         <tr>
-          <td style="background:#1A1714;padding:22px 32px;">
-            <table role="presentation" cellpadding="0" cellspacing="0">
-              <tr>
-                <td style="padding-right:10px;">
-                  <div style="width:34px;height:34px;border-radius:9px;background:#C2912E;text-align:center;font-family:'Archivo',Arial,sans-serif;font-weight:800;color:#1a1206;font-size:18px;line-height:34px;">S</div>
-                </td>
-                <td style="font-family:'Archivo',Arial,sans-serif;font-weight:800;font-size:20px;color:#FFFFFF;letter-spacing:-.01em;">SinoPart</td>
-              </tr>
-            </table>
+          <td style="background:#FFFFFF;padding:22px 32px;border-bottom:1px solid #E7DECF;">
+            <img src="https://getsinopart.com/headerLogo.png" width="197" height="40" alt="SinoPart" style="display:block;border:0;" />
           </td>
         </tr>
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
 import { Inject, Injectable } from '@nestjs/common';
 import { BaseUseCase } from '../base.usecase';
 import { Quote } from '../../domain/entities/quote';
@@ -48,18 +49,13 @@ export class CreateQuoteUseCase extends BaseUseCase<QuoteDto, Quote> {
 
     const created = await this.quoteRepository.create(quote);
 
-    // Fire-and-forget: the quote is saved, so a mail failure must not turn this
-    // into a 500 the customer cannot retry (the 5-minute guard would block
-    // them). The adapter logs its own failures.
-    await Promise.allSettled([
-      this.mailService.sendQuoteAdminAlert({
-        name: created.name,
-        year: created.year,
-        budget: created.budget,
-        whatsAppNumber: created.whatsAppNumber,
-        submittedAt: created.createdAt,
-      }),
-    ]);
+    this.mailService.sendQuoteAdminAlert({
+      name: created.name,
+      year: created.year,
+      budget: created.budget,
+      whatsAppNumber: created.whatsAppNumber,
+      submittedAt: created.createdAt,
+    });
 
     return created;
   }

@@ -54,9 +54,19 @@ export class EnvironmentVariables {
   @MinLength(1)
   MAIL_FROM: string;
 
-  /** Mailbox that receives quote and waitlist alerts. */
+  /** Mailbox that receives quote alerts. */
   @IsEmail()
   ADMIN_EMAIL: string;
+
+  // ---- Slack ----
+  // Incoming webhook that team alerts (waitlist joins, quote requests) post to.
+  // Required, so a misconfigured deploy fails on boot rather than silently
+  // dropping every notification.
+
+  /** Slack incoming webhook URL, e.g. https://hooks.slack.com/services/... */
+  @IsString()
+  @MinLength(1)
+  SLACK_WEBHOOK_URL: string;
 }
 
 export function validateEnv(

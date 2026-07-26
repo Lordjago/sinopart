@@ -8,3 +8,4 @@ export const QUOTE_REPOSITORY = Symbol('QUOTE_REPOSITORY');
 // ----- Service ports (outbound: the core talking to external services) -----
 export const AUTHENTICATION_SERVICE = Symbol('AUTHENTICATION_SERVICE');
 export const MAIL_SERVICE = Symbol('MAIL_SERVICE');
+export const NOTIFICATION_SERVICE = Symbol('NOTIFICATION_SERVICE');

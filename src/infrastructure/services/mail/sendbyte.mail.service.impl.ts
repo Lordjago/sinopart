@@ -4,20 +4,18 @@ import type {
   MailService,
   QuoteAlertInput,
   SendOtpCodeInput,
-  WaitListAlertInput,
   WaitListWelcomeInput,
 } from '../../../core/interfaces/services/mail.service';
 import type { RenderedEmail } from './templates/layout';
 import { otpTemplate } from './templates/otp.template';
 import { quoteAdminTemplate } from './templates/quote-admin.template';
-import { waitListAdminTemplate } from './templates/waitlist-admin.template';
 import { waitListWelcomeTemplate } from './templates/waitlist-welcome.template';
 
 export interface SendByteMailConfig {
   apiKey: string;
   /** e.g. "SinoPart <noreply@sinopart.africa>" */
   from: string;
-  /** Where quote and waitlist alerts land. */
+  /** Where quote alerts land. */
   adminEmail: string;
 }
 
@@ -39,16 +37,6 @@ export class SendByteMailServiceImpl implements MailService {
       input.email,
       waitListWelcomeTemplate(input),
       'waitlist-welcome',
-    );
-  }
-
-  async sendWaitListAdminAlert(input: WaitListAlertInput): Promise<void> {
-    await this.deliver(
-      this.config.adminEmail,
-      waitListAdminTemplate(input),
-      'waitlist-admin',
-      // Lets the team hit Reply and land in the customer's inbox.
-      input.email,
     );
   }
 

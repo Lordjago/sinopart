@@ -20,9 +20,11 @@ import { JwtModule } from '@nestjs/jwt';
 import {
   AUTHENTICATION_SERVICE,
   MAIL_SERVICE,
+  NOTIFICATION_SERVICE,
 } from '../../core/injection.token';
 import { AuthenticationServiceImpl } from './authentication/authentication.service.impl';
 import { SendByteMailServiceImpl } from './mail/sendbyte.mail.service.impl';
+import { SlackNotificationServiceImpl } from './slack/slack.notification.service.impl';
 
 @Module({
   imports: [
@@ -56,7 +58,22 @@ import { SendByteMailServiceImpl } from './mail/sendbyte.mail.service.impl';
           adminEmail: config.getOrThrow<string>('ADMIN_EMAIL'),
         }),
     },
+    // Slack incoming webhook for internal team alerts (waitlist joins, quote
+    // requests). The URL is validated on boot (env.validation).
+    {
+      provide: NOTIFICATION_SERVICE,
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) =>
+        new SlackNotificationServiceImpl({
+          webhookUrl: config.getOrThrow<string>('SLACK_WEBHOOK_URL'),
+        }),
+    },
   ],
-  exports: [AUTHENTICATION_SERVICE, MAIL_SERVICE, JwtModule],
+  exports: [
+    AUTHENTICATION_SERVICE,
+    MAIL_SERVICE,
+    NOTIFICATION_SERVICE,
+    JwtModule,
+  ],
 })
 export class ServiceModule {}

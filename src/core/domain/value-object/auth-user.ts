@@ -10,7 +10,6 @@
  * both the HTTP layer and the use cases agree on the shape of "who is calling".
  */
 export interface AuthUser {
-  /** The user's database id. Lives in the JWT's standard `sub` claim. */
   id: string;
   name: string;
   email: string;

@@ -58,7 +58,7 @@ export class SendEmailVerificationUseCase extends BaseUseCase<
 
     const otp: Otp = {
       codeToken,
-      email: user.email,
+      channelAddress: user.email,
       purpose: OtpPurpose.EMAIL_VERIFICATION,
       codeHash: await this.auth.hashPassword(code),
       attempts: 0,

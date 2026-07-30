@@ -17,8 +17,11 @@ import { MongooseModule } from '@nestjs/mongoose';
 
 import {
   CAR_REPOSITORY,
+  INVITATION_REPOSITORY,
+  LISTING_REPOSITORY,
   OTP_REPOSITORY,
   QUOTE_REPOSITORY,
+  SUPPLIER_REPOSITORY,
   USER_REPOSITORY,
   WAITLIST_REPOSITORY,
 } from '../../core/injection.token';
@@ -33,6 +36,13 @@ import { OtpRepositoryImpl } from './mongoose/repositories/otp.repository.impl';
 import { WaitListRepositoryImpl } from './mongoose/repositories/waitlist.repository.impl';
 import { QuoteRepositoryImpl } from './mongoose/repositories/quote.repository.impl';
 import { QuoteSchema } from './mongoose/documents/quote.document';
+import { SupplierSchema } from './mongoose/documents/supplier.document';
+import { InvitationSchema } from './mongoose/documents/invitation.document';
+import { SupplierRepositoryImpl } from './mongoose/repositories/supplier.repository.impl';
+import { InvitationRepositoryImpl } from './mongoose/repositories/invitation.repository.impl';
+import { ListingSchema } from './mongoose/documents/listing.document';
+import { ListingRepositoryImpl } from './mongoose/repositories/listing.repository.impl';
+import { ServiceModule } from '../services/service.module';
 
 @Module({
   imports: [
@@ -53,7 +63,13 @@ import { QuoteSchema } from './mongoose/documents/quote.document';
       { name: 'otps', schema: OtpSchema },
       { name: 'waitlist', schema: WaitListSchema },
       { name: 'quotes', schema: QuoteSchema },
+      { name: 'suppliers', schema: SupplierSchema },
+      { name: 'invitations', schema: InvitationSchema },
+      { name: 'listings', schema: ListingSchema },
     ]),
+    // For FieldCipher, injected into SupplierRepositoryImpl to encrypt bank
+    // account numbers at rest.
+    ServiceModule,
   ],
   providers: [
     { provide: USER_REPOSITORY, useClass: UserRepositoryImpl },
@@ -61,6 +77,9 @@ import { QuoteSchema } from './mongoose/documents/quote.document';
     { provide: OTP_REPOSITORY, useClass: OtpRepositoryImpl },
     { provide: WAITLIST_REPOSITORY, useClass: WaitListRepositoryImpl },
     { provide: QUOTE_REPOSITORY, useClass: QuoteRepositoryImpl },
+    { provide: SUPPLIER_REPOSITORY, useClass: SupplierRepositoryImpl },
+    { provide: INVITATION_REPOSITORY, useClass: InvitationRepositoryImpl },
+    { provide: LISTING_REPOSITORY, useClass: ListingRepositoryImpl },
   ],
   // Exporting the tokens (and MongooseModule) lets other modules depend on the
   // storage ports without knowing the concrete adapters.
@@ -71,6 +90,9 @@ import { QuoteSchema } from './mongoose/documents/quote.document';
     OTP_REPOSITORY,
     WAITLIST_REPOSITORY,
     QUOTE_REPOSITORY,
+    SUPPLIER_REPOSITORY,
+    INVITATION_REPOSITORY,
+    LISTING_REPOSITORY,
   ],
 })
 export class DatabaseModule {}

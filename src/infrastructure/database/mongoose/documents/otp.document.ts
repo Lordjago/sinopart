@@ -2,12 +2,13 @@
  * Otp document (Mongoose schema) — persistence model for an OTP attempt
  * ---------------------------------------------------------------------------
  * Two indexes matter here:
- *   - `codeToken` is unique + indexed: it is the lookup key on every verify/reset.
+ *   - `codeToken` is unique + indexed: it is the lookup key on every verify.
  *   - `expiresAt` carries `expires: 0`, a MongoDB TTL index. Mongo automatically
  *     DELETES the document once that timestamp passes, so expired codes clean
  *     themselves up and the collection never grows unbounded.
  *
- * Note we store `codeHash`, never the 6 digits themselves.
+ * `channelAddress` is generic (email OR phone) so one collection serves every
+ * OTP channel. We store `codeHash`, never the 6 digits themselves.
  */
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
@@ -20,8 +21,8 @@ export class OtpDoc {
   @Prop({ required: true, unique: true, index: true })
   codeToken: string;
 
-  @Prop({ required: true, lowercase: true, trim: true, index: true })
-  email: string;
+  @Prop({ required: true, trim: true, index: true })
+  channelAddress: string;
 
   @Prop({ type: String, enum: OtpPurpose, required: true })
   purpose: OtpPurpose;
@@ -34,6 +35,10 @@ export class OtpDoc {
 
   @Prop({ default: false })
   verified: boolean;
+
+  // Only set for invitation-gated supplier sign-up; null otherwise.
+  @Prop({ type: String, default: null })
+  inviteCode?: string | null;
 
   @Prop({ type: Date, default: null })
   consumedAt?: Date | null;

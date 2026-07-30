@@ -52,7 +52,7 @@ export class ResetPasswordUseCase extends BaseUseCase<
       );
     }
 
-    const user = await this.userRepository.findByEmail(otp.email);
+    const user = await this.userRepository.findByEmail(otp.channelAddress);
     if (!user) {
       throw new ResourceNotFoundError('Account not found.');
     }

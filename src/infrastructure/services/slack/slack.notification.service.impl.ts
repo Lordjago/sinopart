@@ -1,14 +1,3 @@
-/**
- * SlackNotificationServiceImpl — the ADAPTER implementing NotificationService
- * ---------------------------------------------------------------------------
- * Posts team alerts to a Slack channel through an Incoming Webhook. A webhook is
- * a single URL bound to one channel, so there is no token or bot user to manage:
- * we POST a Block Kit payload and Slack renders it in the channel.
- *
- * Every send is best-effort. The customer's waitlist join / quote request has
- * already been saved by the time we get here, so a Slack outage must not surface
- * as an error — failures are caught and logged, never thrown.
- */
 import { Logger } from '@nestjs/common';
 import type {
   NotificationService,
@@ -17,7 +6,6 @@ import type {
 } from '../../../core/interfaces/services/notification.service';
 
 export interface SlackNotificationConfig {
-  /** Incoming webhook URL, e.g. https://hooks.slack.com/services/T.../B.../xxx */
   webhookUrl: string;
 }
 

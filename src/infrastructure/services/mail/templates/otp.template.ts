@@ -23,6 +23,13 @@ const COPY: Record<
     title: 'Verify your email',
     lead: 'Use the code below to confirm this email address.',
   },
+  // Phone verification is delivered by SMS, not email, so this entry only
+  // satisfies the exhaustive Record type; it is never actually rendered.
+  [OtpPurpose.PHONE_VERIFICATION]: {
+    subject: 'Your SinoPart verification code',
+    title: 'Verify your phone',
+    lead: 'Use the code below to confirm your phone number.',
+  },
 };
 
 export function otpTemplate(input: SendOtpCodeInput): RenderedEmail {

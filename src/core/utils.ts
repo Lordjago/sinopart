@@ -28,6 +28,31 @@ export function generateCodeToken(): string {
 }
 
 /**
+ * Generate a supplier invitation code, e.g. "SINO-7F3K-9QP2". Two groups of
+ * four unambiguous characters (no 0/O/1/I/L) so ops can read a code over the
+ * phone without confusion. `randomInt` keeps it cryptographic — an invite code
+ * is a bearer credential, so it must not be guessable.
+ */
+export function generateInvitationCode(): string {
+  const ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+  const group = () =>
+    Array.from({ length: 4 }, () => ALPHABET[randomInt(0, ALPHABET.length)]).join(
+      '',
+    );
+  return `SINO-${group()}-${group()}`;
+}
+
+/**
+ * Normalise a Chinese mobile number to E.164 form (+8613800138000). Accepts the
+ * shapes the DTO allows — bare 11-digit ("138…"), "86138…", or "+86138…" — and
+ * always returns the canonical "+86…" so lookups and storage are consistent.
+ */
+export function normalizeCnPhone(phone: string): string {
+  const digits = phone.replace(/[^\d]/g, '').replace(/^86/, '');
+  return `+86${digits}`;
+}
+
+/**
  * Pull a Bearer token out of an `Authorization` header. Returns `undefined` if
  * the header is missing or is not a Bearer token. Used by the auth guard.
  */

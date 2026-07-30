@@ -50,7 +50,7 @@ export class ResendOtpUseCase extends BaseUseCase<CodeTokenDto, CodeTokenDto> {
     await this.otpRepository.update(otp);
 
     await this.mail.sendOtpCode({
-      to: otp.email,
+      to: otp.channelAddress,
       code,
       purpose: otp.purpose,
       expiresInMinutes: OTP_TTL_MINUTES,

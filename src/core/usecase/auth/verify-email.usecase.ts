@@ -53,7 +53,7 @@ export class VerifyEmailUseCase extends BaseUseCase<
     if (
       !otp ||
       otp.purpose !== OtpPurpose.EMAIL_VERIFICATION ||
-      otp.email !== user.email
+      otp.channelAddress !== user.email
     ) {
       throw new ValidationError('That code is not right, or it has expired.');
     }

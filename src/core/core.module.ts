@@ -33,6 +33,28 @@ import { GetWaitListUseCase } from './usecase/waitlist/get-waitlist.usecase';
 import { CreateQuoteUseCase } from './usecase/request-quote/create-quote.usecase';
 import { GetQuoteUseCase } from './usecase/request-quote/get-quote.usecase';
 
+// supplier auth
+import { CheckInvitationUseCase } from './usecase/supplier-auth/check-invitation.usecase';
+import { IssueInvitationUseCase } from './usecase/supplier-auth/issue-invitation.usecase';
+import { SendPhoneOtpUseCase } from './usecase/supplier-auth/send-phone-otp.usecase';
+import { VerifyPhoneOtpUseCase } from './usecase/supplier-auth/verify-phone-otp.usecase';
+import { ResendPhoneOtpUseCase } from './usecase/supplier-auth/resend-phone-otp.usecase';
+import { GetSupplierProfileUseCase } from './usecase/supplier-auth/get-supplier-profile.usecase';
+import { UploadKycDocumentUseCase } from './usecase/supplier-auth/upload-kyc-document.usecase';
+import { SubmitKycUseCase } from './usecase/supplier-auth/submit-kyc.usecase';
+import { GetKycStatusUseCase } from './usecase/supplier-auth/get-kyc-status.usecase';
+// listing
+import { CreateListingUseCase } from './usecase/listing/create-listing.usecase';
+import { UpdateListingUseCase } from './usecase/listing/update-listing.usecase';
+import { PublishListingUseCase } from './usecase/listing/publish-listing.usecase';
+import { PauseListingUseCase } from './usecase/listing/pause-listing.usecase';
+import { DeleteListingUseCase } from './usecase/listing/delete-listing.usecase';
+import { GetListingUseCase } from './usecase/listing/get-listing.usecase';
+import { ListSupplierListingsUseCase } from './usecase/listing/list-supplier-listings.usecase';
+import { ListPublicListingsUseCase } from './usecase/listing/list-public-listings.usecase';
+import { GetPublicListingUseCase } from './usecase/listing/get-public-listing.usecase';
+import { UploadListingPhotoUseCase } from './usecase/listing/upload-listing-photo.usecase';
+
 const useCases = [
   // auth
   RegisterUserUseCase,
@@ -52,6 +74,28 @@ const useCases = [
   //quote
   CreateQuoteUseCase,
   GetQuoteUseCase,
+
+  // supplier auth
+  CheckInvitationUseCase,
+  IssueInvitationUseCase,
+  SendPhoneOtpUseCase,
+  VerifyPhoneOtpUseCase,
+  ResendPhoneOtpUseCase,
+  GetSupplierProfileUseCase,
+  UploadKycDocumentUseCase,
+  SubmitKycUseCase,
+  GetKycStatusUseCase,
+  // listing
+  CreateListingUseCase,
+  UpdateListingUseCase,
+  PublishListingUseCase,
+  PauseListingUseCase,
+  DeleteListingUseCase,
+  GetListingUseCase,
+  ListSupplierListingsUseCase,
+  ListPublicListingsUseCase,
+  GetPublicListingUseCase,
+  UploadListingPhotoUseCase,
 ];
 
 @Module({

@@ -54,7 +54,7 @@ export class ForgotPasswordUseCase extends BaseUseCase<EmailDto, CodeTokenDto> {
 
     const otp: Otp = {
       codeToken,
-      email: user.email,
+      channelAddress: user.email,
       purpose: OtpPurpose.PASSWORD_RESET,
       codeHash: await this.auth.hashPassword(code),
       attempts: 0,

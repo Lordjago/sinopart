@@ -13,6 +13,7 @@ import { plainToInstance } from 'class-transformer';
 import {
   IsEmail,
   IsInt,
+  IsOptional,
   IsString,
   Min,
   MinLength,
@@ -67,6 +68,15 @@ export class EnvironmentVariables {
   @IsString()
   @MinLength(1)
   SLACK_WEBHOOK_URL: string;
+
+  // ---- File storage (optional) ----
+  // Only KYC uploads need it, so — unlike the services above — the app boots
+  // without it (a null adapter errors only if someone uploads). Set it to switch
+  // storage on. Format: cloudinary://<api_key>:<api_secret>@<cloud_name>
+  @IsOptional()
+  @IsString()
+  @MinLength(1)
+  CLOUDINARY_URL?: string;
 }
 
 export function validateEnv(

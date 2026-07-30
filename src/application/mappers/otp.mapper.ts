@@ -8,11 +8,12 @@ export class OtpMapper {
     return {
       _id: raw._id?.toString(),
       codeToken: raw.codeToken,
-      email: raw.email,
+      channelAddress: raw.channelAddress,
       purpose: raw.purpose,
       codeHash: raw.codeHash,
       attempts: raw.attempts ?? 0,
       verified: raw.verified ?? false,
+      inviteCode: raw.inviteCode ?? null,
       consumedAt: raw.consumedAt ?? null,
       expiresAt: raw.expiresAt,
       createdAt: raw.createdAt,
@@ -23,17 +24,21 @@ export class OtpMapper {
   static toPersistence(otp: Partial<Otp>): Record<string, any> {
     return {
       codeToken: otp.codeToken,
-      email: otp.email,
+      channelAddress: otp.channelAddress,
       purpose: otp.purpose,
       codeHash: otp.codeHash,
       attempts: otp.attempts ?? 0,
       verified: otp.verified ?? false,
+      inviteCode: otp.inviteCode ?? null,
       consumedAt: otp.consumedAt ?? null,
       expiresAt: otp.expiresAt,
     };
   }
 
-  /** Mutable subset of an OTP — codeToken/email/purpose are fixed at creation. */
+  /**
+   * Mutable subset — codeToken/channelAddress/purpose/inviteCode are fixed at
+   * creation.
+   */
   static toUpdate(otp: Partial<Otp>): Record<string, any> {
     return {
       codeHash: otp.codeHash,

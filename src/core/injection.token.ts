@@ -4,8 +4,13 @@ export const CAR_REPOSITORY = Symbol('CAR_REPOSITORY');
 export const OTP_REPOSITORY = Symbol('OTP_REPOSITORY');
 export const WAITLIST_REPOSITORY = Symbol('WAITLIST_REPOSITORY');
 export const QUOTE_REPOSITORY = Symbol('QUOTE_REPOSITORY');
+export const SUPPLIER_REPOSITORY = Symbol('SUPPLIER_REPOSITORY');
+export const INVITATION_REPOSITORY = Symbol('INVITATION_REPOSITORY');
+export const LISTING_REPOSITORY = Symbol('LISTING_REPOSITORY');
 
 // ----- Service ports (outbound: the core talking to external services) -----
 export const AUTHENTICATION_SERVICE = Symbol('AUTHENTICATION_SERVICE');
 export const MAIL_SERVICE = Symbol('MAIL_SERVICE');
 export const NOTIFICATION_SERVICE = Symbol('NOTIFICATION_SERVICE');
+export const SMS_SERVICE = Symbol('SMS_SERVICE');
+export const FILE_STORAGE_SERVICE = Symbol('FILE_STORAGE_SERVICE');

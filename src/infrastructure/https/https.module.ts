@@ -15,14 +15,29 @@ import { APP_GUARD } from '@nestjs/core';
 import { CoreModule } from '../../core/core.module';
 import { ServiceModule } from '../services/service.module';
 import { AuthGuard } from './guards/auth.guard';
+import { RolesGuard } from './guards/roles.guard';
 
 import { AuthController } from './controllers/auth.controller';
 import { WaitListController } from './controllers/waitlist.controller';
 import { QuoteController } from './controllers/quote.controller';
+import { SupplierAuthController } from './controllers/supplier-auth.controller';
+import { ListingController } from './controllers/listing.controller';
 
 @Module({
   imports: [CoreModule, ServiceModule],
-  controllers: [AuthController, WaitListController, QuoteController],
-  providers: [{ provide: APP_GUARD, useClass: AuthGuard }],
+  controllers: [
+    AuthController,
+    WaitListController,
+    QuoteController,
+    SupplierAuthController,
+    ListingController,
+  ],
+  // Guard order matters: AuthGuard (authn, populates request.user) MUST run
+  // before RolesGuard (authz, reads request.user.role). Global guards run in
+  // the order they are listed here.
+  providers: [
+    { provide: APP_GUARD, useClass: AuthGuard },
+    { provide: APP_GUARD, useClass: RolesGuard },
+  ],
 })
 export class HttpsModule {}

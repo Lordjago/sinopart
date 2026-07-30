@@ -25,6 +25,7 @@ import { Response } from 'express';
 import { ResourceNotFoundError } from '../../../core/errors/resource-not-found.error';
 import { ResourceAlreadyExistsError } from '../../../core/errors/resource-already-exists.error';
 import { UnauthorizedError } from '../../../core/errors/unauthorized.error';
+import { ForbiddenError } from '../../../core/errors/forbidden.error';
 import { ValidationError } from '../../../core/errors/validation.error';
 
 // Default code per HTTP status when an exception carries none.
@@ -43,6 +44,7 @@ const DOMAIN_ERROR_MAP = new Map<Function, { status: number; code: string }>([
   [ResourceNotFoundError, { status: 404, code: 'NOT_FOUND' }],
   [ResourceAlreadyExistsError, { status: 409, code: 'CONFLICT' }],
   [UnauthorizedError, { status: 401, code: 'UNAUTHENTICATED' }],
+  [ForbiddenError, { status: 403, code: 'FORBIDDEN' }],
   [ValidationError, { status: 422, code: 'VALIDATION' }],
 ]);
 

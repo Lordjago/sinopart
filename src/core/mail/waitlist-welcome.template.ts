@@ -9,14 +9,17 @@
  * "free"/"exclusive"/"early access". Those are the words that push a
  * transactional email into Promotions or spam.
  */
-import type { WaitListWelcomeInput } from '../../../../core/interfaces/services/mail.service';
-import { escapeHtml, type RenderedEmail } from './layout';
+import type { Email } from '../interfaces/services/mail.service';
+import { escapeHtml } from './layout';
+
+export interface WaitListWelcomeInput {
+  email: string;
+  name?: string;
+}
 
 const SUBJECT = "You're on the SinoPart waitlist";
 
-export function waitListWelcomeTemplate(
-  input: WaitListWelcomeInput,
-): RenderedEmail {
+export function waitListWelcomeTemplate(input: WaitListWelcomeInput): Email {
   // The design ships unpersonalised so it works for the email-only popup too.
   // We only add a name when the signup actually captured one — "Welcome in."
   // reads fine on its own, "Welcome in, ." does not.
@@ -110,5 +113,5 @@ export function waitListWelcomeTemplate(
 </body>
 </html>`;
 
-  return { subject: SUBJECT, html };
+  return { to: input.email, subject: SUBJECT, html, tag: 'waitlist-welcome' };
 }

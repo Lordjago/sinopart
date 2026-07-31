@@ -1,8 +1,3 @@
-/**
- * Invitation document (Mongoose schema). `code` is unique + indexed (the lookup
- * key during sign-up). `expiresAt` is a plain field checked in the use case —
- * NOT a TTL index, so consumed/revoked invites survive for audit.
- */
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 import { InvitationStatus } from '../../../../core/domain/entities/invitation';

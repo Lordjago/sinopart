@@ -1,13 +1,3 @@
-/**
- * CloudinaryStorageServiceImpl — the ADAPTER that stores files in Cloudinary.
- * ---------------------------------------------------------------------------
- * Bound to FILE_STORAGE_SERVICE in service.module when CLOUDINARY_URL is set.
- * Uploads go over Cloudinary's upload_stream (buffer in, no temp file).
- *
- * KYC documents are NOT public marketing images: `type: 'authenticated'` means
- * Cloudinary won't serve them from a guessable URL — they need a signed link,
- * which the app generates when an admin actually needs to view one.
- */
 import { Logger } from '@nestjs/common';
 import { v2 as cloudinary, type UploadApiResponse } from 'cloudinary';
 import type {
@@ -20,8 +10,6 @@ export class CloudinaryStorageServiceImpl implements FileStorageService {
   private readonly logger = new Logger('FileStorage');
 
   constructor(cloudinaryUrl: string) {
-    // CLOUDINARY_URL (cloudinary://key:secret@cloud) configures the SDK globally.
-    // Passing it explicitly keeps config out of the adapter and in env/DI.
     cloudinary.config({ secure: true, ...parseCloudinaryUrl(cloudinaryUrl) });
   }
 
@@ -30,8 +18,8 @@ export class CloudinaryStorageServiceImpl implements FileStorageService {
       const stream = cloudinary.uploader.upload_stream(
         {
           folder: input.folder,
-          resource_type: 'auto', // handles both images and PDFs
-          type: 'authenticated', // not publicly reachable without a signed URL
+          resource_type: 'auto',
+          type: 'authenticated',
         },
         (error, result?: UploadApiResponse) => {
           if (error || !result) {
@@ -53,7 +41,6 @@ export class CloudinaryStorageServiceImpl implements FileStorageService {
     try {
       await cloudinary.uploader.destroy(key, { type: 'authenticated' });
     } catch (err) {
-      // Best-effort: a failed cleanup shouldn't break the caller's flow.
       this.logger.warn(
         `Cloudinary remove failed for ${key}: ${(err as Error).message}`,
       );

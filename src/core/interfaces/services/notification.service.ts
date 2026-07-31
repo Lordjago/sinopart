@@ -1,22 +1,20 @@
-export interface WaitListJoinedNotification {
-  email: string;
-  name?: string;
-  dealership?: string;
-  whatsAppNumber?: string;
-  city?: string;
-  joinedAt?: Date;
+export interface NotificationField {
+  label: string;
+  value?: string;
 }
 
-export interface QuoteRequestedNotification {
-  name: string;
-  year: number;
-  budget: number;
-  whatsAppNumber: string;
-  submittedAt?: Date;
+export interface NotificationAction {
+  label: string;
+  url: string;
+}
+
+export interface Notification {
+  title: string;
+  fields: NotificationField[];
+  action?: NotificationAction;
+  at?: Date;
 }
 
 export interface NotificationService {
-  notifyWaitListJoined(input: WaitListJoinedNotification): Promise<void>;
-
-  notifyQuoteRequested(input: QuoteRequestedNotification): Promise<void>;
+  notify(notification: Notification): Promise<void>;
 }

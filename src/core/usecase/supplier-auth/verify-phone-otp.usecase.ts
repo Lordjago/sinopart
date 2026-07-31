@@ -87,17 +87,17 @@ export class VerifyPhoneOtpUseCase extends BaseUseCase<
         );
       }
 
-      const toCreate: Supplier = {
+      const newSupplier: Supplier = {
         phone,
-        storeName: invite!.storeName?.trim() || 'New supplier',
+        storeName: invite.storeName?.trim() || 'New supplier',
         province: '', // completed later during KYC / profile
         tier: SupplierTier.NEW,
         accountStatus: SupplierAccountStatus.REGISTERED,
-        invitedBy: invite!.code,
+        invitedBy: invite.code,
         termsAcceptedAt: null,
       };
-      supplier = await this.suppliers.create(toCreate);
-      await this.invitations.markConsumed(invite!.code, supplier._id!);
+      supplier = await this.suppliers.create(newSupplier);
+      await this.invitations.markConsumed(invite.code, supplier._id!);
     }
 
     // Burn the OTP so the same code can't be replayed.

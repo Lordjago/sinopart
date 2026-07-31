@@ -11,6 +11,6 @@ export const LISTING_REPOSITORY = Symbol('LISTING_REPOSITORY');
 // ----- Service ports (outbound: the core talking to external services) -----
 export const AUTHENTICATION_SERVICE = Symbol('AUTHENTICATION_SERVICE');
 export const MAIL_SERVICE = Symbol('MAIL_SERVICE');
-export const NOTIFICATION_SERVICE = Symbol('NOTIFICATION_SERVICE');
+export const MESSAGING_SERVICE = Symbol('MESSAGING_SERVICE');
 export const SMS_SERVICE = Symbol('SMS_SERVICE');
 export const FILE_STORAGE_SERVICE = Symbol('FILE_STORAGE_SERVICE');

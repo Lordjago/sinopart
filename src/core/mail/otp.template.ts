@@ -1,13 +1,13 @@
-import { OtpPurpose } from '../../../../core/domain/entities/otp';
-import type { SendOtpCodeInput } from '../../../../core/interfaces/services/mail.service';
-import {
-  BRAND,
-  escapeHtml,
-  heading,
-  layout,
-  paragraph,
-  type RenderedEmail,
-} from './layout';
+import { OtpPurpose } from '../domain/entities/otp';
+import type { Email } from '../interfaces/services/mail.service';
+import { BRAND, escapeHtml, heading, layout, paragraph } from './layout';
+
+export interface SendOtpCodeInput {
+  to: string;
+  code: string;
+  purpose: OtpPurpose;
+  expiresInMinutes: number;
+}
 
 const COPY: Record<
   OtpPurpose,
@@ -32,8 +32,8 @@ const COPY: Record<
   },
 };
 
-export function otpTemplate(input: SendOtpCodeInput): RenderedEmail {
-  const { code, purpose, expiresInMinutes } = input;
+export function otpTemplate(input: SendOtpCodeInput): Email {
+  const { to, code, purpose, expiresInMinutes } = input;
   const copy = COPY[purpose];
 
   const body = `
@@ -57,6 +57,7 @@ export function otpTemplate(input: SendOtpCodeInput): RenderedEmail {
   `;
 
   return {
+    to,
     subject: copy.subject,
     // The code goes in the preheader too, so it is readable from the inbox list
     // without opening the mail.
@@ -65,5 +66,6 @@ export function otpTemplate(input: SendOtpCodeInput): RenderedEmail {
       preheader: `${code} — expires in ${expiresInMinutes} minutes`,
       body,
     }),
+    tag: 'otp',
   };
 }

@@ -3,14 +3,10 @@ import { Inject, Injectable } from '@nestjs/common';
 import { BaseUseCase } from '../base.usecase';
 import { Quote } from '../../domain/entities/quote';
 import { ResourceAlreadyExistsError } from '../../errors/resource-already-exists.error';
-import {
-  MAIL_SERVICE,
-  NOTIFICATION_SERVICE,
-  QUOTE_REPOSITORY,
-} from '../../injection.token';
+import { MESSAGING_SERVICE, QUOTE_REPOSITORY } from '../../injection.token';
 import type { QuoteRepository } from '../../interfaces/repository/quote.repository';
-import type { MailService } from '../../interfaces/services/mail.service';
 import type { NotificationService } from '../../interfaces/services/notification.service';
+import { quoteRequestedNotification } from '../../notifications/quote-requested.notification';
 import type { QuoteDto } from '../../../application/dtos/request-quote/quote.dto';
 
 /**
@@ -26,9 +22,7 @@ export class CreateQuoteUseCase extends BaseUseCase<QuoteDto, Quote> {
   constructor(
     @Inject(QUOTE_REPOSITORY)
     private readonly quoteRepository: QuoteRepository,
-    @Inject(MAIL_SERVICE)
-    private readonly mailService: MailService,
-    @Inject(NOTIFICATION_SERVICE)
+    @Inject(MESSAGING_SERVICE)
     private readonly notificationService: NotificationService,
   ) {
     super();
@@ -56,22 +50,16 @@ export class CreateQuoteUseCase extends BaseUseCase<QuoteDto, Quote> {
 
     const created = await this.quoteRepository.create(quote);
 
-    // Quote alerts go to BOTH the admin inbox and the team's Slack channel.
-    this.mailService.sendQuoteAdminAlert({
-      name: created.name,
-      year: created.year,
-      budget: created.budget,
-      whatsAppNumber: created.whatsAppNumber,
-      submittedAt: created.createdAt,
-    });
-
-    this.notificationService.notifyQuoteRequested({
-      name: created.name,
-      year: created.year,
-      budget: created.budget,
-      whatsAppNumber: created.whatsAppNumber,
-      submittedAt: created.createdAt,
-    });
+    // Quote alerts go to the team's Slack channel.
+    this.notificationService.notify(
+      quoteRequestedNotification({
+        name: created.name,
+        year: created.year,
+        budget: created.budget,
+        whatsAppNumber: created.whatsAppNumber,
+        submittedAt: created.createdAt,
+      }),
+    );
 
     return created;
   }

@@ -23,8 +23,6 @@ export class FieldCipher {
   private readonly key: Buffer;
 
   constructor(secret: string) {
-    // Fixed salt is fine here: the secret is already high-entropy (an env key),
-    // and scrypt just stretches it to exactly 32 bytes for AES-256.
     this.key = scryptSync(secret, 'sinopart:field-cipher:v1', 32);
   }
 

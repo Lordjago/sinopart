@@ -1,24 +1,5 @@
-/**
- * Environment variable validation
- * ---------------------------------------------------------------------------
- * We validate the whole environment ONCE at startup and crash early with a clear
- * message if anything is missing or malformed — far better than failing deep
- * inside a request later. `ConfigModule.forRoot({ validate: validateEnv })` (in
- * app.module) runs this against `process.env` on boot.
- *
- * We reuse the same class-validator decorators here that DTOs use for request
- * bodies, so there is one validation system to learn across the whole app.
- */
 import { plainToInstance } from 'class-transformer';
-import {
-  IsEmail,
-  IsInt,
-  IsOptional,
-  IsString,
-  Min,
-  MinLength,
-  validateSync,
-} from 'class-validator';
+import { IsInt, IsString, Min, MinLength, validateSync } from 'class-validator';
 
 export class EnvironmentVariables {
   @IsInt()
@@ -40,43 +21,21 @@ export class EnvironmentVariables {
   @MinLength(1)
   JWT_EXPIRES_IN: string;
 
-  // ---- Email (all required) ----
-  // SendByte is the only mail adapter, so the app refuses to boot without a
-  // full mail configuration. Failing here beats discovering at the first OTP
-  // that nothing can be delivered.
-
-  /** SendByte secret key. */
   @IsString()
   @MinLength(1)
   SENDBYTE_API_KEY: string;
 
-  /** Sender identity, e.g. "SinoPart <noreply@sinopart.africa>". */
   @IsString()
   @MinLength(1)
   MAIL_FROM: string;
 
-  /** Mailbox that receives quote alerts. */
-  @IsEmail()
-  ADMIN_EMAIL: string;
-
-  // ---- Slack ----
-  // Incoming webhook that team alerts (waitlist joins, quote requests) post to.
-  // Required, so a misconfigured deploy fails on boot rather than silently
-  // dropping every notification.
-
-  /** Slack incoming webhook URL, e.g. https://hooks.slack.com/services/... */
   @IsString()
   @MinLength(1)
   SLACK_WEBHOOK_URL: string;
 
-  // ---- File storage (optional) ----
-  // Only KYC uploads need it, so — unlike the services above — the app boots
-  // without it (a null adapter errors only if someone uploads). Set it to switch
-  // storage on. Format: cloudinary://<api_key>:<api_secret>@<cloud_name>
-  @IsOptional()
   @IsString()
   @MinLength(1)
-  CLOUDINARY_URL?: string;
+  CLOUDINARY_URL: string;
 }
 
 export function validateEnv(

@@ -21,6 +21,7 @@ import type { UserRepository } from '../../interfaces/repository/user.repository
 import type { OtpRepository } from '../../interfaces/repository/otp.repository';
 import type { AuthenticationService } from '../../interfaces/services/authentication.service';
 import type { MailService } from '../../interfaces/services/mail.service';
+import { otpTemplate } from '../../mail/otp.template';
 import { OtpPurpose, OTP_TTL_MINUTES } from '../../domain/entities/otp';
 import type { Otp } from '../../domain/entities/otp';
 import type { EmailDto } from '../../../application/dtos/auth/email.dto';
@@ -64,12 +65,14 @@ export class ForgotPasswordUseCase extends BaseUseCase<EmailDto, CodeTokenDto> {
     };
     await this.otpRepository.create(otp);
 
-    await this.mail.sendOtpCode({
-      to: user.email,
-      code,
-      purpose: OtpPurpose.PASSWORD_RESET,
-      expiresInMinutes: OTP_TTL_MINUTES,
-    });
+    await this.mail.send(
+      otpTemplate({
+        to: user.email,
+        code,
+        purpose: OtpPurpose.PASSWORD_RESET,
+        expiresInMinutes: OTP_TTL_MINUTES,
+      }),
+    );
 
     return { codeToken, expiresInMinutes: OTP_TTL_MINUTES };
   }

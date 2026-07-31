@@ -17,6 +17,7 @@ import {
 import type { OtpRepository } from '../../interfaces/repository/otp.repository';
 import type { AuthenticationService } from '../../interfaces/services/authentication.service';
 import type { MailService } from '../../interfaces/services/mail.service';
+import { otpTemplate } from '../../mail/otp.template';
 import { OTP_TTL_MINUTES } from '../../domain/entities/otp';
 import { ValidationError } from '../../errors/validation.error';
 import type { CodeTokenDto } from '../../../application/dtos/otp/code-token.dto';
@@ -49,12 +50,14 @@ export class ResendOtpUseCase extends BaseUseCase<CodeTokenDto, CodeTokenDto> {
     otp.expiresAt = new Date(Date.now() + OTP_TTL_MINUTES * 60_000);
     await this.otpRepository.update(otp);
 
-    await this.mail.sendOtpCode({
-      to: otp.channelAddress,
-      code,
-      purpose: otp.purpose,
-      expiresInMinutes: OTP_TTL_MINUTES,
-    });
+    await this.mail.send(
+      otpTemplate({
+        to: otp.channelAddress,
+        code,
+        purpose: otp.purpose,
+        expiresInMinutes: OTP_TTL_MINUTES,
+      }),
+    );
 
     return { codeToken: otp.codeToken, expiresInMinutes: OTP_TTL_MINUTES };
   }

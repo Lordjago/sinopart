@@ -7,13 +7,8 @@
  * 600px content column, and web-safe font stacks.
  *
  * Every template supplies only its body; the header, footer and wrapper come
- * from here so all four emails look like one product.
+ * from here so every email looks like one product.
  */
-
-export interface RenderedEmail {
-  subject: string;
-  html: string;
-}
 
 const BRAND = {
   ink: '#0f172a',
@@ -30,8 +25,7 @@ const BRAND = {
  *
  * Every interpolated value in these templates is user-submitted — names,
  * cities, dealership names, WhatsApp numbers. Without this, someone can put
- * markup or a phishing link into an email that lands in an admin's inbox
- * looking like it came from us.
+ * markup or a phishing link into an email that looks like it came from us.
  */
 export function escapeHtml(value: unknown): string {
   return String(value ?? '')
@@ -40,55 +34,6 @@ export function escapeHtml(value: unknown): string {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
-}
-
-/** Naira, grouped, no decimals: 4500000 -> "₦4,500,000". */
-export function formatNaira(amount: number): string {
-  return `₦${Math.round(amount).toLocaleString('en-NG')}`;
-}
-
-export function formatDateTime(date: Date = new Date()): string {
-  return date.toLocaleString('en-NG', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-    timeZone: 'Africa/Lagos',
-  });
-}
-
-/**
- * A label/value table — the shape both admin alerts use to list what someone
- * submitted. Values are escaped here so callers cannot forget.
- */
-export function detailRows(rows: Array<[string, string | undefined]>): string {
-  return rows
-    .filter(([, value]) => value !== undefined && value !== '')
-    .map(
-      ([label, value]) => `
-        <tr>
-          <td style="padding:10px 0;border-bottom:1px solid ${BRAND.line};color:${BRAND.muted};font-size:14px;width:40%;vertical-align:top;">
-            ${escapeHtml(label)}
-          </td>
-          <td style="padding:10px 0;border-bottom:1px solid ${BRAND.line};color:${BRAND.ink};font-size:14px;font-weight:600;">
-            ${escapeHtml(value)}
-          </td>
-        </tr>`,
-    )
-    .join('');
-}
-
-/** A centred call-to-action button that survives Outlook. */
-export function button(label: string, href: string): string {
-  return `
-    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:28px auto 8px;">
-      <tr>
-        <td style="border-radius:6px;background:${BRAND.accent};">
-          <a href="${escapeHtml(href)}"
-             style="display:inline-block;padding:12px 28px;font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:6px;">
-            ${escapeHtml(label)}
-          </a>
-        </td>
-      </tr>
-    </table>`;
 }
 
 /**

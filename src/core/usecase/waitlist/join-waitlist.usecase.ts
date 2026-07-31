@@ -5,12 +5,14 @@ import { WaitList } from '../../domain/entities/waitlist';
 import { ResourceAlreadyExistsError } from '../../errors/resource-already-exists.error';
 import {
   MAIL_SERVICE,
-  NOTIFICATION_SERVICE,
+  MESSAGING_SERVICE,
   WAITLIST_REPOSITORY,
 } from '../../injection.token';
 import type { WaitListRepository } from '../../interfaces/repository/waitlist.repository';
 import type { MailService } from '../../interfaces/services/mail.service';
+import { waitListWelcomeTemplate } from '../../mail/waitlist-welcome.template';
 import type { NotificationService } from '../../interfaces/services/notification.service';
+import { waitListJoinedNotification } from '../../notifications/waitlist-joined.notification';
 import type { WaitListDto } from '../../../application/dtos/waitlist/waitlist.dto';
 
 @Injectable()
@@ -20,7 +22,7 @@ export class JoinWaitListUseCase extends BaseUseCase<WaitListDto, WaitList> {
     private readonly waitListRepository: WaitListRepository,
     @Inject(MAIL_SERVICE)
     private readonly mailService: MailService,
-    @Inject(NOTIFICATION_SERVICE)
+    @Inject(MESSAGING_SERVICE)
     private readonly notificationService: NotificationService,
   ) {
     super();
@@ -46,20 +48,24 @@ export class JoinWaitListUseCase extends BaseUseCase<WaitListDto, WaitList> {
     const created = await this.waitListRepository.create(waitlist);
 
     // Welcome email to the customer.
-    this.mailService.sendWaitListWelcome({
-      email: created.email,
-      name: created.name,
-    });
+    this.mailService.send(
+      waitListWelcomeTemplate({
+        email: created.email,
+        name: created.name,
+      }),
+    );
 
-    // Alert the team in Slack (replaces the old admin email).
-    this.notificationService.notifyWaitListJoined({
-      email: created.email,
-      name: created.name,
-      dealership: created.dealership,
-      whatsAppNumber: created.whatsAppNumber,
-      city: created.city,
-      joinedAt: created.createdAt,
-    });
+    // Alert the team in Slack.
+    this.notificationService.notify(
+      waitListJoinedNotification({
+        email: created.email,
+        name: created.name,
+        dealership: created.dealership,
+        whatsAppNumber: created.whatsAppNumber,
+        city: created.city,
+        joinedAt: created.createdAt,
+      }),
+    );
 
     return created;
   }

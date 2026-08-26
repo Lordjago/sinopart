@@ -1,5 +1,5 @@
 /**
- * UserRepositoryImpl — the ADAPTER that implements the UserRepository port
+ * UserRepositoryImpl: the ADAPTER that implements the UserRepository port
  * ---------------------------------------------------------------------------
  * This is where the core's storage contract meets real MongoDB. It receives the
  * Mongoose Model via `@InjectModel`, runs the queries, and uses UserMapper to
@@ -10,11 +10,16 @@
  */
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { FilterQuery, Model } from 'mongoose';
 import { UserMapper } from '../../../../application/mappers/user.mapper';
-import type { User } from '../../../../core/domain/entities/user';
-import type { UserRepository } from '../../../../core/interfaces/repository/user.repository';
+import type { User, UserRole } from '../../../../core/domain/entities/user';
+import { Page } from '../../../../core/domain/value-object/page';
+import type {
+  UserFilters,
+  UserRepository,
+} from '../../../../core/interfaces/repository/user.repository';
 import { UserDocument } from '../documents/user.document';
+import { contains } from '../query.util';
 
 @Injectable()
 export class UserRepositoryImpl implements UserRepository {
@@ -40,6 +45,49 @@ export class UserRepositoryImpl implements UserRepository {
     return UserMapper.toDomain(doc);
   }
 
+  async findAll(filters: UserFilters): Promise<Page<User>> {
+    const page = Math.max(1, filters.page ?? 1);
+    const limit = Math.max(1, filters.limit ?? 20);
+
+    const query: FilterQuery<UserDocument> = {};
+    if (filters.roles?.length) query.role = { $in: filters.roles };
+    if (filters.verified != null) query.verified = filters.verified;
+    if (filters.search) {
+      const term = contains(filters.search);
+      query.$or = [{ name: term }, { email: term }, { business: term }];
+    }
+
+    const [docs, total] = await Promise.all([
+      this.model
+        .find(query)
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .exec(),
+      this.model.countDocuments(query).exec(),
+    ]);
+
+    return new Page(
+      docs.map((d) => UserMapper.toDomain(d)!),
+      page,
+      limit,
+      total,
+    );
+  }
+
+  async countByRole(): Promise<Record<string, number>> {
+    const rows = await this.model
+      .aggregate<{ _id: string; count: number }>([
+        { $group: { _id: '$role', count: { $sum: 1 } } },
+      ])
+      .exec();
+    return Object.fromEntries(rows.map((r) => [r._id, r.count]));
+  }
+
+  async existsWithRole(role: UserRole): Promise<boolean> {
+    return (await this.model.exists({ role })) != null;
+  }
+
   async updatePassword(userId: string, passwordHash: string): Promise<void> {
     await this.model
       .updateOne({ _id: userId }, { $set: { passwordHash } })
@@ -50,5 +98,19 @@ export class UserRepositoryImpl implements UserRepository {
     await this.model
       .updateOne({ _id: userId }, { $set: { emailVerified: true } })
       .exec();
+  }
+
+  async setVerified(userId: string, verified: boolean): Promise<User> {
+    const updated = await this.model
+      .findByIdAndUpdate(userId, { $set: { verified } }, { new: true })
+      .exec();
+    return UserMapper.toDomain(updated)!;
+  }
+
+  async setKycStatus(userId: string, status: string | null): Promise<User> {
+    const updated = await this.model
+      .findByIdAndUpdate(userId, { $set: { kycStatus: status } }, { new: true })
+      .exec();
+    return UserMapper.toDomain(updated)!;
   }
 }

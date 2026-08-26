@@ -1,10 +1,10 @@
 /**
- * ForgotPasswordUseCase — start a password reset (POST /auth/forgot-password)
+ * ForgotPasswordUseCase: start a password reset (POST /auth/forgot-password)
  * ---------------------------------------------------------------------------
  * Issues a 6-digit code, stores only its HASH, emails the code, and returns the
  * `codeToken` handle the client uses for the next two steps.
  *
- * SECURITY — account enumeration: if the email has no account we still return a
+ * SECURITY: account enumeration: if the email has no account we still return a
  * perfectly normal-looking `codeToken` (a decoy) and send nothing. An attacker
  * therefore cannot use this endpoint to discover which emails are registered.
  * The decoy simply never verifies, because nothing was persisted.

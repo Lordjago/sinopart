@@ -1,5 +1,5 @@
 /**
- * UploadKycDocumentUseCase — store one KYC document (POST /supplier-auth/kyc/documents)
+ * UploadKycDocumentUseCase: store one KYC document (POST /supplier-auth/kyc/documents)
  * ---------------------------------------------------------------------------
  * Called once per document (license, identity, store photo). It stores the file
  * via the storage port, then attaches a PENDING KycDocument to the supplier,
@@ -83,11 +83,17 @@ export class UploadKycDocumentUseCase extends BaseUseCase<
       folder: `suppliers/${input.supplierId}/kyc`,
     });
 
+    // A re-upload starts review again from scratch: PENDING, and any earlier
+    // reviewer's note cleared, so the admin panel never shows last round's
+    // rejection reason against this round's file.
     const doc: KycDocument = {
       type: input.type,
       url: stored.url,
+      filename: input.filename ?? null,
+      mimeType: input.mimeType ?? null,
       status: KycDocumentStatus.PENDING,
       rejectionReason: null,
+      reviewedBy: null,
       uploadedAt: new Date(),
       reviewedAt: null,
     };

@@ -1,5 +1,5 @@
 /**
- * Supplier document (Mongoose schema) — persistence model for a supplier.
+ * Supplier document (Mongoose schema): persistence model for a supplier.
  * `phone` is unique + indexed (it is the login identity). `province` defaults to
  * '' because it is completed later during KYC, not at phone-OTP sign-up.
  */
@@ -16,7 +16,7 @@ import {
 
 export type SupplierDocument = HydratedDocument<SupplierDoc>;
 
-/** One uploaded KYC document, embedded in the supplier. `_id: false` — these are
+/** One uploaded KYC document, embedded in the supplier. `_id: false`, these are
  *  identified by `type`, not their own id. */
 @Schema({ _id: false })
 export class KycDocumentSub {
@@ -25,6 +25,15 @@ export class KycDocumentSub {
 
   @Prop({ required: true })
   url: string;
+
+  // The reviewer needs to know WHAT was sent, not just where it landed: the
+  // original name is the only human label a stored file has, and the mime type
+  // decides whether the panel renders an <img> or a PDF frame.
+  @Prop({ type: String, default: null })
+  filename?: string | null;
+
+  @Prop({ type: String, default: null })
+  mimeType?: string | null;
 
   @Prop({
     type: String,
@@ -35,6 +44,9 @@ export class KycDocumentSub {
 
   @Prop({ type: String, default: null })
   rejectionReason?: string | null;
+
+  @Prop({ type: String, default: null })
+  reviewedBy?: string | null;
 
   @Prop({ type: Date, required: true })
   uploadedAt: Date;
@@ -62,6 +74,29 @@ export class BankAccountSub {
   last4: string;
 }
 const BankAccountSchema = SchemaFactory.createForClass(BankAccountSub);
+
+/** The store's registered office, collected on the KYC submit step. Plain text,
+ *  unlike the bank account: there is nothing secret about the address printed on
+ *  a business licence, and a reviewer has to read one against the other.
+ *  `_id: false`, it is a single embedded value, not a collection of them. */
+@Schema({ _id: false })
+export class OfficeAddressSub {
+  @Prop({ required: true, trim: true })
+  street: string;
+
+  @Prop({ required: true, trim: true })
+  city: string;
+
+  @Prop({ required: true, trim: true })
+  province: string;
+
+  @Prop({ type: String, default: null, trim: true })
+  postalCode?: string | null;
+
+  @Prop({ required: true, trim: true })
+  country: string;
+}
+const OfficeAddressSchema = SchemaFactory.createForClass(OfficeAddressSub);
 
 @Schema({ collection: 'suppliers', timestamps: true })
 export class SupplierDoc {
@@ -95,6 +130,9 @@ export class SupplierDoc {
 
   @Prop({ type: Date, default: null })
   termsAcceptedAt?: Date | null;
+
+  @Prop({ type: OfficeAddressSchema, default: null })
+  officeAddress?: OfficeAddressSub | null;
 
   @Prop({ type: [KycDocumentSchema], default: [] })
   kycDocuments: KycDocumentSub[];

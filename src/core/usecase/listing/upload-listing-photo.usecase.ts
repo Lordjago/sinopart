@@ -1,9 +1,9 @@
 /**
- * UploadListingPhotoUseCase — store one listing photo, return its URL.
+ * UploadListingPhotoUseCase: store one listing photo, return its URL.
  * ---------------------------------------------------------------------------
  * Listings hold photos as stored URLs, so the client uploads each image here
  * first (getting back a URL) and then sends those URLs in create/update. Images
- * only — a car photo is never a PDF.
+ * only, a car photo is never a PDF.
  */
 import { Inject, Injectable } from '@nestjs/common';
 import { BaseUseCase } from '../base.usecase';

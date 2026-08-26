@@ -14,7 +14,7 @@ export class ConsoleSmsServiceImpl implements SmsService {
       [
         '',
         '  ┌───────────────────────────────────────────────┐',
-        '  │  📱  SMS OTP (development — not really sent)   │',
+        '  │  📱  SMS OTP (development, not really sent)   │',
         '  ├───────────────────────────────────────────────┤',
         `  │  To      : ${phone}`,
         `  │  Code    : ${code}`,
@@ -26,3 +26,4 @@ export class ConsoleSmsServiceImpl implements SmsService {
     return Promise.resolve();
   }
 }
+

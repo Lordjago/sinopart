@@ -1,5 +1,5 @@
 /**
- * AuthUser — the authenticated principal carried on a request
+ * AuthUser: the authenticated principal carried on a request
  * ---------------------------------------------------------------------------
  * When a request presents a valid JWT, the auth guard decodes the token and
  * attaches this object to `request.user`; the `@CurrentUser()` decorator then

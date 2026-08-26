@@ -1,5 +1,5 @@
 /**
- * utils — small, framework-free helpers shared across the core
+ * utils. Small, framework-free helpers shared across the core
  * ---------------------------------------------------------------------------
  * Pure functions only: no NestJS, no Mongoose. Anything that needs those lives
  * in the infrastructure layer instead.
@@ -9,7 +9,7 @@ import { randomInt, randomUUID } from 'crypto';
 /**
  * Generate a 6-digit OTP code as a string, e.g. "042917".
  *
- * Uses `crypto.randomInt` — NOT `Math.random()`. Math.random is predictable
+ * Uses `crypto.randomInt`. NOT `Math.random()`. Math.random is predictable
  * enough that an attacker who sees a few codes could guess the next one; codes
  * that guard a password reset must come from a cryptographic source.
  * `padStart` keeps leading zeros so the code is always exactly 6 characters.
@@ -30,7 +30,7 @@ export function generateCodeToken(): string {
 /**
  * Generate a supplier invitation code, e.g. "SINO-7F3K-9QP2". Two groups of
  * four unambiguous characters (no 0/O/1/I/L) so ops can read a code over the
- * phone without confusion. `randomInt` keeps it cryptographic — an invite code
+ * phone without confusion. `randomInt` keeps it cryptographic, an invite code
  * is a bearer credential, so it must not be guessable.
  */
 export function generateInvitationCode(): string {
@@ -44,7 +44,7 @@ export function generateInvitationCode(): string {
 
 /**
  * Normalise a Chinese mobile number to E.164 form (+8613800138000). Accepts the
- * shapes the DTO allows — bare 11-digit ("138…"), "86138…", or "+86138…" — and
+ * shapes the DTO allows (bare 11-digit "138…", "86138…", or "+86138…") and
  * always returns the canonical "+86…" so lookups and storage are consistent.
  */
 export function normalizeCnPhone(phone: string): string {

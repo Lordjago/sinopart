@@ -1,12 +1,12 @@
 /**
- * Page<T> — a value object describing one page of a paginated list
+ * Page<T>. A value object describing one page of a paginated list
  * ---------------------------------------------------------------------------
  * A "value object" is a small, immutable object defined entirely by its data
  * (not by an identity). This one is the standard envelope every list endpoint
  * returns: the rows plus the metadata a UI needs to render pagination.
  *
  * It lives in `core/domain` because pagination is a business concept, not a
- * detail of HTTP or MongoDB — repositories return it and use cases pass it on.
+ * detail of HTTP or MongoDB. Repositories return it and use cases pass it on.
  */
 export class Page<T> {
   data: T[];

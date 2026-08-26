@@ -1,5 +1,5 @@
 /**
- * OtpRepositoryImpl — the ADAPTER implementing the OtpRepository port
+ * OtpRepositoryImpl: the ADAPTER implementing the OtpRepository port
  * ---------------------------------------------------------------------------
  * Bound to the OTP_REPOSITORY token in database.module. Uses OtpMapper to
  * translate documents ⇄ the `Otp` domain entity so use cases never touch

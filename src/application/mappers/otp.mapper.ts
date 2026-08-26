@@ -36,7 +36,7 @@ export class OtpMapper {
   }
 
   /**
-   * Mutable subset — codeToken/channelAddress/purpose/inviteCode are fixed at
+   * Mutable subset: codeToken/channelAddress/purpose/inviteCode are fixed at
    * creation.
    */
   static toUpdate(otp: Partial<Otp>): Record<string, any> {

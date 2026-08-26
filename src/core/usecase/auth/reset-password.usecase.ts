@@ -1,8 +1,8 @@
 /**
- * ResetPasswordUseCase — set the new password (POST /auth/reset-password)
+ * ResetPasswordUseCase: set the new password (POST /auth/reset-password)
  * ---------------------------------------------------------------------------
  * The critical guard is `if (!otp.verified)`. Without it, anyone holding a
- * codeToken could change a password WITHOUT ever knowing the 6-digit code —
+ * codeToken could change a password WITHOUT ever knowing the 6-digit code,
  * which would make the whole OTP step decorative. This is exactly the check that
  * makes the "codeToken-only" reset DTO safe.
  *

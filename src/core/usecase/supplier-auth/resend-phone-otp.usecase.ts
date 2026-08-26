@@ -11,7 +11,8 @@ import type { SmsService } from '../../interfaces/services/sms.service';
 import { OtpPurpose, OTP_TTL_MINUTES } from '../../domain/entities/otp';
 import { ValidationError } from '../../errors/validation.error';
 import type { CodeTokenDto } from '../../../application/dtos/otp/code-token.dto';
-import { generateOtpCode } from '../../utils';
+// generateOtpCode is unimported while the static OTP below is in force.
+// import { generateOtpCode } from '../../utils';
 
 @Injectable()
 export class ResendPhoneOtpUseCase extends BaseUseCase<
@@ -39,7 +40,14 @@ export class ResendPhoneOtpUseCase extends BaseUseCase<
       );
     }
 
-    const code = generateOtpCode();
+    // TEMPORARY: no SMS provider is integrated yet, so a random code could
+    // not be delivered and nobody could get through phone verification.
+    // Every supplier OTP is the fixed code below. Everything else is
+    // unchanged: it is still hashed, still expires, still attempt-capped.
+    // TO REMOVE once SMS is live: delete the literal, uncomment the line
+    // below, and restore the generateOtpCode import at the top of this file.
+    const code = '890123';
+    // const code = generateOtpCode();
     otp.codeHash = await this.auth.hashPassword(code);
     otp.attempts = 0;
     otp.verified = false;

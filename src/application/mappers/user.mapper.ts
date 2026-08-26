@@ -18,6 +18,7 @@ export class UserMapper {
       tier: raw.tier,
       verified: raw.verified,
       emailVerified: raw.emailVerified ?? false,
+      kycStatus: raw.kycStatus ?? null,
       createdAt: raw.createdAt,
       updatedAt: raw.updatedAt,
     };
@@ -48,6 +49,7 @@ export class UserMapper {
       tier: user.tier,
       verified: user.verified,
       emailVerified: user.emailVerified,
+      kycStatus: user.kycStatus ?? null,
     };
   }
 }

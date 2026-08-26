@@ -1,5 +1,5 @@
 /**
- * AuthenticationServiceImpl — the ADAPTER for the AuthenticationService port
+ * AuthenticationServiceImpl: the ADAPTER for the AuthenticationService port
  * ---------------------------------------------------------------------------
  * Supplies the auth primitives the core needs, using real libraries the core is
  * kept unaware of: bcrypt for password hashing and @nestjs/jwt for signing

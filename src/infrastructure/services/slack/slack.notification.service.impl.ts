@@ -11,7 +11,7 @@ export interface SlackNotificationConfig {
 
 type SlackBlock = Record<string, unknown>;
 
-const EMPTY = '—';
+const EMPTY = '-';
 
 export class SlackNotificationServiceImpl implements NotificationService {
   private readonly logger = new Logger('SlackNotificationService');

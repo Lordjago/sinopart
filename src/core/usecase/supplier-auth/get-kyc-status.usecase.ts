@@ -1,5 +1,5 @@
 /**
- * GetKycStatusUseCase — the supplier's verification state (GET /supplier-auth/kyc/status)
+ * GetKycStatusUseCase: the supplier's verification state (GET /supplier-auth/kyc/status)
  * ---------------------------------------------------------------------------
  * Drives the "Verify your store" screen: which documents are in, which were
  * bounced (and why), whether the store can submit, and the current review state.

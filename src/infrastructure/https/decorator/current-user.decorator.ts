@@ -1,5 +1,5 @@
 /**
- * @CurrentUser() — hands a controller the authenticated user
+ * @CurrentUser(). Hands a controller the authenticated user
  * ---------------------------------------------------------------------------
  * A custom parameter decorator. After the AuthGuard verifies the token it puts
  * the decoded principal on `request.user`; this decorator reads it back out and
@@ -7,7 +7,7 @@
  *
  *     me(@CurrentUser() user: AuthUser) { ... }
  *
- * Keep it paired with a protected route — on a @Public() route there is no
+ * Keep it paired with a protected route. On a @Public() route there is no
  * `request.user` to read.
  */
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';

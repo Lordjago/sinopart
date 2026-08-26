@@ -1,5 +1,5 @@
 /**
- * AuthController — HTTP endpoints for authentication (a DRIVING adapter)
+ * AuthController: HTTP endpoints for authentication (a DRIVING adapter)
  * ---------------------------------------------------------------------------
  * Controllers are thin: they map a URL + verb to a use case and return its
  * result. No try/catch (the exception filter formats errors) and no response

@@ -1,5 +1,5 @@
 /**
- * ResendOtpUseCase — send a fresh code for an existing attempt
+ * ResendOtpUseCase: send a fresh code for an existing attempt
  * (POST /auth/resend-otp)
  * ---------------------------------------------------------------------------
  * Backs the "Resend code" button. It reuses the SAME codeToken, so the client

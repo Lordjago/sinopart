@@ -1,17 +1,17 @@
 /**
- * CustomExceptionFilter — turns any thrown error into the frontend's error shape
+ * CustomExceptionFilter: turns any thrown error into the frontend's error shape
  * ---------------------------------------------------------------------------
  * Registered globally (main.ts). It is the ONE place that maps errors to HTTP.
  * Two sources of errors converge here:
  *
  *   - DOMAIN errors thrown by use cases (ResourceNotFoundError, …). The core is
- *     framework-free, so it cannot set a status code — this adapter does, via the
+ *     framework-free, so it cannot set a status code, this adapter does, via the
  *     `errorStatusMap` below.
  *   - Nest HttpExceptions (e.g. the ValidationPipe's 422). We read their status
  *     and body directly.
  *
  * Everything leaves as:  { success: false, error: { code, message } }
- * with the right status — matching what the frontend expects.
+ * with the right status. Matching what the frontend expects.
  */
 import {
   ArgumentsHost,

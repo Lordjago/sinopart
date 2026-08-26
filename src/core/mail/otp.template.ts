@@ -52,7 +52,7 @@ export function otpTemplate(input: SendOtpCodeInput): Email {
 
     ${paragraph(`This code expires in <strong>${escapeHtml(expiresInMinutes)} minutes</strong>.`)}
     ${paragraph(
-      `<span style="color:${BRAND.muted};font-size:14px;">If you did not request this, you can safely ignore this email — nothing changes until the code is used.</span>`,
+      `<span style="color:${BRAND.muted};font-size:14px;">If you did not request this, you can safely ignore this email. Nothing changes until the code is used.</span>`,
     )}
   `;
 
@@ -63,7 +63,7 @@ export function otpTemplate(input: SendOtpCodeInput): Email {
     // without opening the mail.
     html: layout({
       title: copy.subject,
-      preheader: `${code} — expires in ${expiresInMinutes} minutes`,
+      preheader: `${code}. Expires in ${expiresInMinutes} minutes`,
       body,
     }),
     tag: 'otp',

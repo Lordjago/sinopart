@@ -1,5 +1,5 @@
 /**
- * WaitListRepositoryImpl — the ADAPTER implementing the WaitListRepository port
+ * WaitListRepositoryImpl: the ADAPTER implementing the WaitListRepository port
  * ---------------------------------------------------------------------------
  * Bound to the WAITLIST_REPOSITORY token in database.module. All MongoDB
  * vocabulary stops here: the core asks for "email contains X, created between
@@ -54,7 +54,7 @@ export class WaitListRepositoryImpl implements WaitListRepository {
       query.createdAt = range;
     }
 
-    // Rows and total in one round trip — the count must use the same query, or
+    // Rows and total in one round trip. The count must use the same query, or
     // totalPages will disagree with what the caller actually received.
     const [docs, total] = await Promise.all([
       this.model

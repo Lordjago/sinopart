@@ -3,7 +3,7 @@
  * ---------------------------------------------------------------------------
  * Email clients are not browsers: Outlook renders with Word's engine, Gmail
  * strips <style> blocks in some contexts, and flexbox/grid are unreliable. So
- * this is deliberately old-fashioned — tables for layout, inline styles, a fixed
+ * this is deliberately old-fashioned. Tables for layout, inline styles, a fixed
  * 600px content column, and web-safe font stacks.
  *
  * Every template supplies only its body; the header, footer and wrapper come
@@ -23,7 +23,7 @@ const BRAND = {
 /**
  * Escapes a value before it goes into HTML.
  *
- * Every interpolated value in these templates is user-submitted — names,
+ * Every interpolated value in these templates is user-submitted, names,
  * cities, dealership names, WhatsApp numbers. Without this, someone can put
  * markup or a phishing link into an email that looks like it came from us.
  */

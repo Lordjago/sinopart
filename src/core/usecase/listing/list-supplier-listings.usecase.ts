@@ -1,5 +1,5 @@
 /**
- * ListSupplierListingsUseCase — ALL of a supplier's own listings, newest first.
+ * ListSupplierListingsUseCase: ALL of a supplier's own listings, newest first.
  * The supplier UI filters by status tab and tallies counts client-side, so this
  * returns the full set with no server-side status filter or pagination.
  */

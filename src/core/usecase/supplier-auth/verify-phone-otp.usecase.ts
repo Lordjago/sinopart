@@ -1,5 +1,5 @@
 /**
- * VerifyPhoneOtpUseCase — confirm the SMS code and issue a supplier token
+ * VerifyPhoneOtpUseCase: confirm the SMS code and issue a supplier token
  * (POST /supplier-auth/otp/verify)
  * ---------------------------------------------------------------------------
  * Composes the existing VerifyOtpUseCase (expiry, attempt cap, hash compare) and
@@ -10,7 +10,7 @@
  *   3. sign a JWT with role SELLER, and
  *   4. consume the OTP so the code can't be replayed.
  *
- * Passwordless: identity is the phone, proven by the code — there is no password.
+ * Passwordless: identity is the phone, proven by the code, there is no password.
  */
 import { Inject, Injectable } from '@nestjs/common';
 import { BaseUseCase } from '../base.usecase';

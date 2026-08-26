@@ -1,5 +1,5 @@
 /**
- * HttpResponseInterceptor — wraps every successful response in the API envelope
+ * HttpResponseInterceptor: wraps every successful response in the API envelope
  * ---------------------------------------------------------------------------
  * Registered globally (main.ts). Whatever a use case returns, the client sees:
  *

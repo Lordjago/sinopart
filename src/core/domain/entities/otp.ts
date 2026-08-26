@@ -9,7 +9,7 @@ export enum OtpPurpose {
 export class Otp extends BaseDomain {
   codeToken: string;
   /**
-   * Where the code was sent — an email for email flows, a phone number for the
+   * Where the code was sent: an email for email flows, a phone number for the
    * supplier phone-OTP flow. Generic so one OTP machine serves every channel.
    */
   channelAddress: string;

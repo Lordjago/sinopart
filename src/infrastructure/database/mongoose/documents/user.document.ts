@@ -1,5 +1,5 @@
 /**
- * User document (Mongoose schema) — the PERSISTENCE model
+ * User document (Mongoose schema): the PERSISTENCE model
  * ---------------------------------------------------------------------------
  * This is the infrastructure-layer twin of the `User` domain entity. Where the
  * entity is a pure class, the document carries the database concerns: Mongoose
@@ -12,6 +12,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 import { UserRole, UserTier } from '../../../../core/domain/entities/user';
+import { DealerKycStatus } from '../../../../core/domain/entities/dealer-kyc';
 
 export type UserDocument = HydratedDocument<UserDoc>;
 
@@ -45,6 +46,10 @@ export class UserDoc {
 
   @Prop({ default: false })
   emailVerified: boolean;
+
+  // Mirror of dealerkycs.status. See the note on the User entity.
+  @Prop({ type: String, enum: DealerKycStatus, default: null })
+  kycStatus?: DealerKycStatus | null;
 }
 
 export const UserSchema = SchemaFactory.createForClass(UserDoc);

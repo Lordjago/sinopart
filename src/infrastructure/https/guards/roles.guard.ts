@@ -1,5 +1,5 @@
 /**
- * RolesGuard — authorization, registered globally AFTER AuthGuard
+ * RolesGuard: authorization, registered globally AFTER AuthGuard
  * ---------------------------------------------------------------------------
  * AuthGuard proves WHO you are (populates request.user); this guard checks
  * WHAT you're allowed to do. It reads @Roles(...) metadata:

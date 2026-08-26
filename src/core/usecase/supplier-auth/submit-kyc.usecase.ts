@@ -1,9 +1,10 @@
 /**
- * SubmitKycUseCase — send a store for verification (POST /supplier-auth/kyc/submit)
+ * SubmitKycUseCase: send a store for verification (POST /supplier-auth/kyc/submit)
  * ---------------------------------------------------------------------------
  * The final step of the verify-your-store flow. It checks every required
- * document is uploaded, records the bank account (encrypted by the repo) and
- * terms acceptance, and moves the store REGISTERED/ACTION → REVIEW.
+ * document is uploaded, records the registered office, the bank account
+ * (encrypted by the repo) and terms acceptance, and moves the store
+ * REGISTERED/ACTION → REVIEW.
  *
  * Guards against re-submitting a store that is already under review or verified,
  * so a double-tap or a stale tab can't reset the workflow.
@@ -13,6 +14,7 @@ import { BaseUseCase } from '../base.usecase';
 import { SUPPLIER_REPOSITORY } from '../../injection.token';
 import type { SupplierRepository } from '../../interfaces/repository/supplier.repository';
 import { SupplierAccountStatus } from '../../domain/entities/supplier';
+import type { SupplierOfficeAddress } from '../../domain/entities/supplier';
 import { ResourceNotFoundError } from '../../errors/resource-not-found.error';
 import { ValidationError } from '../../errors/validation.error';
 import { hasAllDocuments, toKycStatus, type KycStatus } from './kyc-status';
@@ -22,6 +24,7 @@ export interface SubmitKycInput {
   bankHolder: string;
   bankName: string;
   accountNumber: string;
+  officeAddress: SupplierOfficeAddress;
   termsAccepted: boolean;
 }
 
@@ -39,6 +42,20 @@ export class SubmitKycUseCase extends BaseUseCase<SubmitKycInput, KycStatus> {
       throw new ValidationError('Accept the supplier terms to submit.');
     }
 
+    // The DTO already rejects blanks, but it cannot see a string of spaces, and
+    // an address of spaces is what a reviewer would have to work from.
+    const officeAddress = trimAddress(input.officeAddress);
+    if (
+      !officeAddress.street ||
+      !officeAddress.city ||
+      !officeAddress.province ||
+      !officeAddress.country
+    ) {
+      throw new ValidationError(
+        'Enter your full office address: street, city, province and country.',
+      );
+    }
+
     const supplier = await this.suppliers.findById(input.supplierId);
     if (!supplier) {
       throw new ResourceNotFoundError('Supplier not found.');
@@ -49,7 +66,7 @@ export class SubmitKycUseCase extends BaseUseCase<SubmitKycInput, KycStatus> {
     }
     if (supplier.accountStatus === SupplierAccountStatus.REVIEW) {
       throw new ValidationError(
-        'Your store is already under review. Hang tight — we will be in touch.',
+        'Your store is already under review. Hang tight, we will be in touch.',
       );
     }
 
@@ -66,9 +83,22 @@ export class SubmitKycUseCase extends BaseUseCase<SubmitKycInput, KycStatus> {
         bankName: input.bankName,
         accountNumber: input.accountNumber,
       },
+      officeAddress,
       new Date(),
     );
 
     return toKycStatus(updated);
   }
+}
+
+/** Whitespace off every part; an absent postal code stays absent, not ''. */
+function trimAddress(address: SupplierOfficeAddress): SupplierOfficeAddress {
+  const clean = (value?: string | null) => (value ?? '').trim();
+  return {
+    street: clean(address?.street),
+    city: clean(address?.city),
+    province: clean(address?.province),
+    postalCode: clean(address?.postalCode) || null,
+    country: clean(address?.country),
+  };
 }

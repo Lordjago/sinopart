@@ -1,5 +1,5 @@
 /**
- * GetProfileUseCase — return the fresh, current user (GET /auth/me)
+ * GetProfileUseCase: return the fresh, current user (GET /auth/me)
  * ---------------------------------------------------------------------------
  * Reads the live record from the database by id rather than trusting the token's
  * claims, so the response always reflects the latest profile and verification

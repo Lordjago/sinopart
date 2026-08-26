@@ -1,10 +1,10 @@
 /**
- * SendEmailVerificationUseCase — email a sign-up confirmation code
+ * SendEmailVerificationUseCase: email a sign-up confirmation code
  * (POST /auth/send-verification, authenticated)
  * ---------------------------------------------------------------------------
  * Runs right after registration, when the client already holds a JWT. Because
  * the caller is authenticated we take the user id from the token rather than an
- * email in the body — so nobody can use this endpoint to spam arbitrary
+ * email in the body. So nobody can use this endpoint to spam arbitrary
  * addresses.
  *
  * Mirrors ForgotPasswordUseCase, but stamps the OTP with

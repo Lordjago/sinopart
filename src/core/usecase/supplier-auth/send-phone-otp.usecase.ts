@@ -18,11 +18,8 @@ import { InvitationStatus } from '../../domain/entities/invitation';
 import { ValidationError } from '../../errors/validation.error';
 import type { SendOtpDto } from '../../../application/dtos/supplier/send-otp.dto';
 import type { CodeTokenDto } from '../../../application/dtos/otp/code-token.dto';
-import {
-  generateCodeToken,
-  generateOtpCode,
-  normalizeCnPhone,
-} from '../../utils';
+// generateOtpCode is unimported while the static OTP below is in force.
+import { generateCodeToken, normalizeCnPhone } from '../../utils';
 
 @Injectable()
 export class SendPhoneOtpUseCase extends BaseUseCase<SendOtpDto, CodeTokenDto> {
@@ -59,7 +56,14 @@ export class SendPhoneOtpUseCase extends BaseUseCase<SendOtpDto, CodeTokenDto> {
       inviteCode = invite!.code;
     }
 
-    const code = generateOtpCode();
+    // TEMPORARY: no SMS provider is integrated yet, so a random code could
+    // not be delivered and nobody could get through phone verification.
+    // Every supplier OTP is the fixed code below. Everything else is
+    // unchanged: it is still hashed, still expires, still attempt-capped.
+    // TO REMOVE once SMS is live: delete the literal, uncomment the line
+    // below, and restore the generateOtpCode import at the top of this file.
+    const code = '890123';
+    // const code = generateOtpCode();
     const codeToken = generateCodeToken();
 
     const otp: Otp = {

@@ -1,5 +1,5 @@
 /**
- * VerifyEmailUseCase — confirm the sign-up email with the 6-digit code
+ * VerifyEmailUseCase: confirm the sign-up email with the 6-digit code
  * (POST /auth/verify-email, authenticated)
  * ---------------------------------------------------------------------------
  * Composes the existing VerifyOtpUseCase rather than duplicating its checks
@@ -7,7 +7,7 @@
  * specific to email confirmation:
  *
  *   1. the OTP must have been issued for EMAIL_VERIFICATION, and
- *   2. it must belong to the signed-in user's own email — so a code issued for
+ *   2. it must belong to the signed-in user's own email, so a code issued for
  *      someone else can never confirm your address, and
  *   3. on success, flip `emailVerified` and consume the attempt.
  */

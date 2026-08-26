@@ -1,5 +1,5 @@
 /**
- * @Roles(...) — declares which roles may call a route. Read by RolesGuard.
+ * @Roles(...). Declares which roles may call a route. Read by RolesGuard.
  * A route with no @Roles is unrestricted (any authenticated caller, subject to
  * @Public()). Usage: `@Roles(UserRole.ADMIN)`.
  */

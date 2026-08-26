@@ -1,5 +1,5 @@
 /**
- * DeleteListingUseCase — delete/withdraw a listing.
+ * DeleteListingUseCase: delete/withdraw a listing.
  * Permitted only for the owner and only in a terminal-safe state (draft, paused,
  * failed). A listing tied to a live order (reserved/pending/sold) can't be
  * deleted.

@@ -1,5 +1,5 @@
 /**
- * FieldCipher — symmetric encryption for sensitive fields at rest (bank account
+ * FieldCipher: symmetric encryption for sensitive fields at rest (bank account
  * numbers today).
  * ---------------------------------------------------------------------------
  * AES-256-GCM: authenticated encryption, so a tampered ciphertext fails to
@@ -9,7 +9,7 @@
  *
  * Output format:  base64(iv):base64(tag):base64(ciphertext)
  *
- * This is an infrastructure concern — the core deals only in plaintext and never
+ * This is an infrastructure concern: the core deals only in plaintext and never
  * sees this class. Provided in ServiceModule; injected into the supplier repo.
  */
 import {

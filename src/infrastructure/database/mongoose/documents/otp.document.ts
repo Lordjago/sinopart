@@ -1,5 +1,5 @@
 /**
- * Otp document (Mongoose schema) — persistence model for an OTP attempt
+ * Otp document (Mongoose schema): persistence model for an OTP attempt
  * ---------------------------------------------------------------------------
  * Two indexes matter here:
  *   - `codeToken` is unique + indexed: it is the lookup key on every verify.

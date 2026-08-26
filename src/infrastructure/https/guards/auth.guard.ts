@@ -1,5 +1,5 @@
 /**
- * AuthGuard — the global gatekeeper (a DRIVING-side adapter concern)
+ * AuthGuard: the global gatekeeper (a DRIVING-side adapter concern)
  * ---------------------------------------------------------------------------
  * Registered globally in https.module, so it runs before EVERY handler. Its job:
  *
@@ -10,7 +10,7 @@
  *   3. If the token is missing or invalid, throw UnauthorizedError (the
  *      exception filter turns that into a 401).
  *
- * Verifying the token here — once, centrally — means individual controllers
+ * Verifying the token here, once and centrally, means individual controllers
  * never deal with auth; they just read `@CurrentUser()`.
  */
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';

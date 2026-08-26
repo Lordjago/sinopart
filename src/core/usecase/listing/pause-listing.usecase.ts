@@ -1,5 +1,5 @@
 /**
- * PauseListingUseCase — take a live listing off the dealer catalog (→ paused).
+ * PauseListingUseCase: take a live listing off the dealer catalog (→ paused).
  * Only a currently-available listing can be paused; relisting goes back through
  * PublishListingUseCase (which re-checks verification).
  */

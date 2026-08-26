@@ -1,11 +1,11 @@
 /**
- * Waitlist confirmation — the auto-reply sent TO the dealer who signed up.
+ * Waitlist confirmation: the auto-reply sent TO the dealer who signed up.
  *
  * This is the approved design, so it ships as a standalone document rather than
  * going through `layout()`: it has its own cream/gold shell that the shared
  * wrapper would fight.
  *
- * Subject and tone are deliberately plain — no emoji, no exclamation marks, no
+ * Subject and tone are deliberately plain. No emoji, no exclamation marks, no
  * "free"/"exclusive"/"early access". Those are the words that push a
  * transactional email into Promotions or spam.
  */
@@ -21,7 +21,7 @@ const SUBJECT = "You're on the SinoPart waitlist";
 
 export function waitListWelcomeTemplate(input: WaitListWelcomeInput): Email {
   // The design ships unpersonalised so it works for the email-only popup too.
-  // We only add a name when the signup actually captured one — "Welcome in."
+  // We only add a name when the signup actually captured one, "Welcome in."
   // reads fine on its own, "Welcome in, ." does not.
   const name = input.name?.trim();
   const welcome = name ? `Welcome in, ${escapeHtml(name)}.` : 'Welcome in.';

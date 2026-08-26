@@ -20,12 +20,24 @@ export class SupplierMapper {
       accountStatus: raw.accountStatus,
       invitedBy: raw.invitedBy ?? null,
       termsAcceptedAt: raw.termsAcceptedAt ?? null,
+      officeAddress: raw.officeAddress
+        ? {
+            street: raw.officeAddress.street,
+            city: raw.officeAddress.city,
+            province: raw.officeAddress.province,
+            postalCode: raw.officeAddress.postalCode ?? null,
+            country: raw.officeAddress.country,
+          }
+        : null,
       kycDocuments: Array.isArray(raw.kycDocuments)
         ? raw.kycDocuments.map((d: any) => ({
             type: d.type,
             url: d.url,
+            filename: d.filename ?? null,
+            mimeType: d.mimeType ?? null,
             status: d.status,
             rejectionReason: d.rejectionReason ?? null,
+            reviewedBy: d.reviewedBy ?? null,
             uploadedAt: d.uploadedAt,
             reviewedAt: d.reviewedAt ?? null,
           }))
@@ -63,7 +75,10 @@ export class SupplierMapper {
       ...(supplier.kycSubmittedAt !== undefined && {
         kycSubmittedAt: supplier.kycSubmittedAt,
       }),
-      // bankAccount is intentionally NOT written here — it is encrypted and can
+      ...(supplier.officeAddress !== undefined && {
+        officeAddress: supplier.officeAddress,
+      }),
+      // bankAccount is intentionally NOT written here, it is encrypted and can
       // only be set through the repo's submitForReview path, never a plain update.
     };
   }

@@ -1,7 +1,27 @@
-import type { Listing } from '../../core/domain/entities/listing';
+import type {
+  Listing,
+  ProposedVehicle,
+} from '../../core/domain/entities/listing';
 import { ListingStatus } from '../../core/domain/entities/listing';
+import { idOf } from './ref.util';
 
 export class ListingMapper {
+  /** The stored proposal, with its two optional catalog refs as plain ids. */
+  static proposalToDomain(raw: any): ProposedVehicle | null {
+    if (!raw) return null;
+    return {
+      brand: raw.brand,
+      brandId: idOf(raw.brandId) ?? null,
+      series: raw.series,
+      seriesId: idOf(raw.seriesId) ?? null,
+      year: raw.year,
+      variant: raw.variant,
+      fuelType: raw.fuelType,
+      transmission: raw.transmission,
+      note: raw.note ?? null,
+    };
+  }
+
   static toDomain(document: any): Listing | null {
     if (document == null) return null;
     const raw =
@@ -11,15 +31,14 @@ export class ListingMapper {
       supplierId: raw.supplierId?.toString(),
       status: raw.status,
       title: raw.title,
+      vehicleId: idOf(raw.vehicleId),
+      seriesId: idOf(raw.seriesId),
+      brandId: idOf(raw.brandId),
+      proposedVehicle: ListingMapper.proposalToDomain(raw.proposedVehicle),
       vin: raw.vin ?? undefined,
-      make: raw.make ?? undefined,
-      model: raw.model ?? undefined,
-      year: raw.year ?? undefined,
-      trim: raw.trim ?? undefined,
       body: raw.body ?? undefined,
       exteriorColor: raw.exteriorColor ?? undefined,
       interiorColor: raw.interiorColor ?? undefined,
-      fuel: raw.fuel ?? undefined,
       drivetrain: raw.drivetrain ?? undefined,
       batteryKwh: raw.batteryKwh ?? null,
       rangeKm: raw.rangeKm ?? null,
@@ -29,8 +48,12 @@ export class ListingMapper {
       doors: raw.doors ?? null,
       features: Array.isArray(raw.features) ? raw.features : [],
       photos: Array.isArray(raw.photos) ? raw.photos : [],
+      videos: Array.isArray(raw.videos) ? raw.videos : [],
       fobPrice: raw.fobPrice ?? undefined,
       province: raw.province ?? undefined,
+      submittedAt: raw.submittedAt ?? null,
+      publishedAt: raw.publishedAt ?? null,
+      reviewNote: raw.reviewNote ?? null,
       createdAt: raw.createdAt,
       updatedAt: raw.updatedAt,
     } as Listing;
@@ -41,15 +64,14 @@ export class ListingMapper {
       supplierId: listing.supplierId,
       status: listing.status ?? ListingStatus.DRAFT,
       title: listing.title,
+      vehicleId: listing.vehicleId ?? null,
+      seriesId: listing.seriesId ?? null,
+      brandId: listing.brandId ?? null,
+      proposedVehicle: listing.proposedVehicle ?? null,
       vin: listing.vin ?? null,
-      make: listing.make ?? null,
-      model: listing.model ?? null,
-      year: listing.year ?? null,
-      trim: listing.trim ?? null,
       body: listing.body ?? null,
       exteriorColor: listing.exteriorColor ?? null,
       interiorColor: listing.interiorColor ?? null,
-      fuel: listing.fuel ?? null,
       drivetrain: listing.drivetrain ?? null,
       batteryKwh: listing.batteryKwh ?? null,
       rangeKm: listing.rangeKm ?? null,
@@ -59,30 +81,37 @@ export class ListingMapper {
       doors: listing.doors ?? null,
       features: listing.features ?? [],
       photos: listing.photos ?? [],
+      videos: listing.videos ?? [],
       fobPrice: listing.fobPrice ?? null,
       province: listing.province ?? null,
+      submittedAt: listing.submittedAt ?? null,
+      publishedAt: listing.publishedAt ?? null,
+      reviewNote: listing.reviewNote ?? null,
     };
   }
 
   /**
    * A patch for `update`: only the keys actually present are written, so a
    * partial edit never nulls out fields the caller didn't touch. `supplierId`
-   * and `status` are deliberately excluded — ownership and lifecycle move
+   * and `status` are deliberately excluded. Ownership and lifecycle move
    * through their own paths, not a field edit.
+   *
+   * `seriesId`/`brandId` ARE writable here, but only the update use case sets
+   * them, and only alongside a new `vehicleId`, they are copies of the
+   * vehicle's parents, never something a client picks.
    */
   static toUpdate(patch: Partial<Listing>): Record<string, any> {
     const out: Record<string, any> = {};
     const fields: (keyof Listing)[] = [
       'title',
+      'vehicleId',
+      'seriesId',
+      'brandId',
+      'proposedVehicle',
       'vin',
-      'make',
-      'model',
-      'year',
-      'trim',
       'body',
       'exteriorColor',
       'interiorColor',
-      'fuel',
       'drivetrain',
       'batteryKwh',
       'rangeKm',
@@ -92,6 +121,7 @@ export class ListingMapper {
       'doors',
       'features',
       'photos',
+      'videos',
       'fobPrice',
       'province',
     ];

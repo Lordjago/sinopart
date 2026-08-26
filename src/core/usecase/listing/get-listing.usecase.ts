@@ -1,5 +1,5 @@
 /**
- * GetListingUseCase — a supplier fetches one of their OWN listings (any status).
+ * GetListingUseCase: a supplier fetches one of their OWN listings (any status).
  * Ownership is enforced: a supplier can never read another store's listing.
  */
 import { Inject, Injectable } from '@nestjs/common';

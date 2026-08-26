@@ -49,19 +49,25 @@ export class SupplierAuthController {
     return this.checkInvitation.execute(code);
   }
 
-  // Admin-only: mint a fresh single-use invite. Authenticated by AuthGuard,
-  // authorized by RolesGuard against @Roles(ADMIN).
-  // @Roles(UserRole.ADMIN)
-  @Public()
+  /**
+   * Mint a fresh single-use invite. Authenticated by AuthGuard, authorized by
+   * RolesGuard against @Roles(ADMIN).
+   *
+   * `issuedBy` is the calling admin's id, taken from the verified token rather
+   * than the body: an audit trail the caller can write for themselves records
+   * nothing worth knowing. The admin panel calls POST /admin/invitations, which
+   * is the same use case. This route stays for the supplier-facing API shape.
+   */
+  @Roles(UserRole.ADMIN)
   @Post('invitations')
   createInvitation(
     @Body() dto: CreateInvitationDto,
-    // @CurrentUser() admin: AuthUser,
+    @CurrentUser() admin: AuthUser,
   ) {
     return this.issueInvitation.execute({
       storeName: dto.storeName,
       expiresInDays: dto.expiresInDays,
-      issuedBy: ' admin.id',
+      issuedBy: admin.id,
     });
   }
 
@@ -107,14 +113,14 @@ export class SupplierAuthController {
     });
   }
 
-  // The supplier's own verification state — drives the "Verify your store" screen.
+  // The supplier's own verification state: drives the "Verify your store" screen.
   @Get('kyc/status')
   kycStatus(@CurrentUser() user: AuthUser) {
     return this.getKycStatus.execute(user.id);
   }
 
-  // Final step: bank + terms + move to REVIEW. Documents are uploaded separately
-  // (kyc/documents) before this is called.
+  // Final step: office address + bank + terms + move to REVIEW. Documents are
+  // uploaded separately (kyc/documents) before this is called.
   @Post('kyc/submit')
   submit(@CurrentUser() user: AuthUser, @Body() dto: SubmitKycDto) {
     return this.submitKyc.execute({
@@ -122,6 +128,13 @@ export class SupplierAuthController {
       bankHolder: dto.bankHolder,
       bankName: dto.bankName,
       accountNumber: dto.accountNumber,
+      officeAddress: {
+        street: dto.officeAddress.street,
+        city: dto.officeAddress.city,
+        province: dto.officeAddress.province,
+        postalCode: dto.officeAddress.postalCode ?? null,
+        country: dto.officeAddress.country,
+      },
       termsAccepted: dto.termsAccepted,
     });
   }

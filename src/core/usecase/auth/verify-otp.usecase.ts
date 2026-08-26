@@ -1,5 +1,5 @@
 /**
- * VerifyOtpUseCase — check the 6-digit code (POST /auth/verify-otp)
+ * VerifyOtpUseCase: check the 6-digit code (POST /auth/verify-otp)
  * ---------------------------------------------------------------------------
  * On success it marks the attempt `verified`, which is the flag
  * ResetPasswordUseCase requires before it will change anything.

@@ -1,5 +1,5 @@
 /**
- * RegisterUserUseCase — create a new dealer account
+ * RegisterUserUseCase: create a new dealer account
  * ---------------------------------------------------------------------------
  * Business steps: reject a duplicate email → hash the password → save the user →
  * issue a JWT. It depends only on PORTS (UserRepository, AuthenticationService),

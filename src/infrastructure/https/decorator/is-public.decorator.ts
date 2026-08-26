@@ -1,5 +1,5 @@
 /**
- * @Public() — marks a route as NOT requiring authentication
+ * @Public(). Marks a route as NOT requiring authentication
  * ---------------------------------------------------------------------------
  * The AuthGuard is registered GLOBALLY (see https.module), so every route
  * requires a valid token by default. This decorator stamps metadata the guard
@@ -8,7 +8,7 @@
  *
  * `SetMetadata` attaches a key/value to the handler; the guard later reads it
  * back with the Reflector. Defaulting to "secure unless marked public" is safer
- * than "public unless marked secure" — forgetting the decorator fails closed.
+ * than "public unless marked secure". Forgetting the decorator fails closed.
  */
 import { SetMetadata } from '@nestjs/common';
 

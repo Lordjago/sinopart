@@ -1,5 +1,5 @@
 /**
- * QuoteRepositoryImpl — the ADAPTER implementing the QuoteRepository port
+ * QuoteRepositoryImpl: the ADAPTER implementing the QuoteRepository port
  * ---------------------------------------------------------------------------
  * Bound to the QUOTE_REPOSITORY token in database.module. All MongoDB
  * vocabulary stops here: the core asks for "name contains X, budget between
@@ -54,7 +54,7 @@ export class QuoteRepositoryImpl implements QuoteRepository {
       query.createdAt = range;
     }
 
-    // Rows and total in one round trip — the count must use the same query, or
+    // Rows and total in one round trip. The count must use the same query, or
     // totalPages will disagree with what the caller actually received.
     const [docs, total] = await Promise.all([
       this.model

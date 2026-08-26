@@ -32,7 +32,7 @@ export class SendByteMailServiceImpl implements MailService {
       });
       this.logger.log(`Sent "${tag}" to ${to} (id: ${id})`);
     } catch (error) {
-      // Swallowed on purpose — see the class comment. Logged with the API's
+      // Swallowed on purpose: see the class comment. Logged with the API's
       // error code when SendByte gave us one, since that is what their docs
       // are indexed by.
       if (error instanceof SendByteError) {

@@ -47,7 +47,7 @@ export class CreateVehicleUseCase extends BaseUseCase<
       fuelType: input.fuelType.trim(),
       transmission: input.transmission.trim(),
       variant: input.variant,
-    } as Vehicle;
+    };
 
     const clash = await this.vehicles.findByKey(vehicle);
     if (clash) {

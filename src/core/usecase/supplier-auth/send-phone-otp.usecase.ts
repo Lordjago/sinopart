@@ -53,7 +53,7 @@ export class SendPhoneOtpUseCase extends BaseUseCase<SendOtpDto, CodeTokenDto> {
       if (!usable) {
         throw new ValidationError('That invitation is invalid or has expired.');
       }
-      inviteCode = invite!.code;
+      inviteCode = invite.code;
     }
 
     // TEMPORARY: no SMS provider is integrated yet, so a random code could

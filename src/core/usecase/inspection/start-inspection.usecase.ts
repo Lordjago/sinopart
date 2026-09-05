@@ -19,21 +19,28 @@
  *   - the buyer must be signed in. The controller enforces the role; this
  *     records who it was, because a reservation with no owner is meaningless.
  */
+/* eslint-disable @typescript-eslint/no-floating-promises */
 import { Inject, Injectable } from '@nestjs/common';
 import { BaseUseCase } from '../base.usecase';
 import {
   INSPECTION_REPOSITORY,
   LISTING_REPOSITORY,
+  MAIL_SERVICE,
+  USER_REPOSITORY,
 } from '../../injection.token';
 import type { InspectionRepository } from '../../interfaces/repository/inspection.repository';
 import type { ListingRepository } from '../../interfaces/repository/listing.repository';
+import type { UserRepository } from '../../interfaces/repository/user.repository';
+import type { MailService } from '../../interfaces/services/mail.service';
+import { inspectionBookedTemplate } from '../../mail/inspection.template';
+import { inspectionMailFacts } from './inspection-mail';
 import {
   buildInspectionRef,
   reservationDeadline,
   InspectionStatus,
   type Inspection,
 } from '../../domain/entities/inspection';
-import { ListingStatus } from '../../domain/entities/listing';
+import { ListingStatus, type Listing } from '../../domain/entities/listing';
 import { ResourceNotFoundError } from '../../errors/resource-not-found.error';
 import { ValidationError } from '../../errors/validation.error';
 import { SettingsService } from '../config/settings.service';
@@ -45,7 +52,6 @@ export interface StartInspectionInput {
   paymentReference?: string | null;
 }
 
-
 @Injectable()
 export class StartInspectionUseCase extends BaseUseCase<
   StartInspectionInput,
@@ -56,6 +62,10 @@ export class StartInspectionUseCase extends BaseUseCase<
     private readonly inspections: InspectionRepository,
     @Inject(LISTING_REPOSITORY)
     private readonly listings: ListingRepository,
+    @Inject(USER_REPOSITORY)
+    private readonly users: UserRepository,
+    @Inject(MAIL_SERVICE)
+    private readonly mail: MailService,
     private readonly settings: SettingsService,
   ) {
     super();
@@ -103,12 +113,39 @@ export class StartInspectionUseCase extends BaseUseCase<
       paidAt: now,
       paymentReference: input.paymentReference ?? null,
       reservedUntil: reservationDeadline(now, hours),
-    } as Inspection);
+    });
 
     // The reservation is the point. If this write fails the fee has been taken
     // for a car still on sale, so it is not something to do best-effort.
     await this.listings.setStatus(input.listingId, ListingStatus.RESERVED);
 
+    /* Confirm the booking. Not awaited, and not allowed to throw: the money is
+       taken and the car is held either way, so a mail problem must not surface
+       as a failed checkout. */
+    this.sendBookedEmail(inspection, listing, fee);
+
     return inspection;
+  }
+
+  private async sendBookedEmail(
+    inspection: Inspection,
+    listing: Listing,
+    fee: number,
+  ): Promise<void> {
+    const facts = await inspectionMailFacts(
+      { users: this.users, listings: this.listings },
+      inspection,
+      listing,
+    );
+    if (!facts) return;
+
+    await this.mail.send(
+      inspectionBookedTemplate({
+        ...facts,
+        fee,
+        reservedUntil: inspection.reservedUntil,
+        paidAt: inspection.paidAt ?? undefined,
+      }),
+    );
   }
 }

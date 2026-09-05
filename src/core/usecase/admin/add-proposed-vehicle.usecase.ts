@@ -79,7 +79,9 @@ export class AddProposedVehicleUseCase extends BaseUseCase<
       ? await this.brands.findById(proposed.brandId)
       : await this.brands.findByName(proposed.brand);
     if (!brand) {
-      brand = await this.brands.create({ name: proposed.brand.trim() } as Brand);
+      brand = await this.brands.create({
+        name: proposed.brand.trim(),
+      });
       created.push('brand');
     }
 
@@ -90,7 +92,7 @@ export class AddProposedVehicleUseCase extends BaseUseCase<
       series = await this.series.create({
         brandId: brand._id!,
         name: proposed.series.trim(),
-      } as Series);
+      });
       created.push('series');
     }
 
@@ -103,7 +105,7 @@ export class AddProposedVehicleUseCase extends BaseUseCase<
     };
     let vehicle = await this.vehicles.findByKey(key);
     if (!vehicle) {
-      vehicle = await this.vehicles.create(key as Vehicle);
+      vehicle = await this.vehicles.create(key);
       created.push('vehicle');
     }
 

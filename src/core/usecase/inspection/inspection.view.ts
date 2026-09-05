@@ -46,6 +46,12 @@ export interface InspectionView {
 
   /** The car, resolved so no screen has to make a second call for a title. */
   listingId: string;
+  /**
+   * Identity carries more than a title because the condition report prints it:
+   * the sheet's identity grid names the drivetrain, the registration date and
+   * both colours, and those live on the listing, not on the report. Without
+   * them the grid renders half-empty against a car the dealer cannot see.
+   */
   car: {
     title: string;
     vin: string | null;
@@ -54,6 +60,10 @@ export interface InspectionView {
     province: string | null;
     mileageKm: number | null;
     status: string | null;
+    drivetrain: string | null;
+    firstRegistered: string | null;
+    exteriorColor: string | null;
+    interiorColor: string | null;
   } | null;
 
   supplierId: string;
@@ -120,6 +130,10 @@ export function toInspectionView(
           province: listing.province ?? null,
           mileageKm: listing.mileageKm ?? null,
           status: listing.status ?? null,
+          drivetrain: listing.drivetrain ?? null,
+          firstRegistered: listing.firstRegistered ?? null,
+          exteriorColor: listing.exteriorColor ?? null,
+          interiorColor: listing.interiorColor ?? null,
         }
       : null,
 

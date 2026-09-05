@@ -47,6 +47,6 @@ export class CreateSeriesUseCase extends BaseUseCase<
       );
     }
 
-    return this.series.create({ brandId: input.brandId, name } as Series);
+    return this.series.create({ brandId: input.brandId, name });
   }
 }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
 /**
  * SubmitInspectionReportUseCase: the back office files the inspector's findings.
  * (POST /admin/inspections/:id/report)
@@ -22,9 +23,18 @@ import { BaseUseCase } from '../base.usecase';
 import {
   INSPECTION_REPOSITORY,
   LISTING_REPOSITORY,
+  MAIL_SERVICE,
+  USER_REPOSITORY,
 } from '../../injection.token';
 import type { InspectionRepository } from '../../interfaces/repository/inspection.repository';
 import type { ListingRepository } from '../../interfaces/repository/listing.repository';
+import type { UserRepository } from '../../interfaces/repository/user.repository';
+import type { MailService } from '../../interfaces/services/mail.service';
+import {
+  inspectionFailedTemplate,
+  inspectionPassedTemplate,
+} from '../../mail/inspection.template';
+import { inspectionMailFacts } from './inspection-mail';
 import {
   REPORTABLE_STATUSES,
   InspectionStatus,
@@ -36,8 +46,10 @@ import { ListingStatus } from '../../domain/entities/listing';
 import { ResourceNotFoundError } from '../../errors/resource-not-found.error';
 import { ValidationError } from '../../errors/validation.error';
 
-export interface SubmitInspectionReportInput
-  extends Omit<InspectionReport, 'submittedAt'> {
+export interface SubmitInspectionReportInput extends Omit<
+  InspectionReport,
+  'submittedAt'
+> {
   inspectionId: string;
 }
 
@@ -51,6 +63,10 @@ export class SubmitInspectionReportUseCase extends BaseUseCase<
     private readonly inspections: InspectionRepository,
     @Inject(LISTING_REPOSITORY)
     private readonly listings: ListingRepository,
+    @Inject(USER_REPOSITORY)
+    private readonly users: UserRepository,
+    @Inject(MAIL_SERVICE)
+    private readonly mail: MailService,
   ) {
     super();
   }
@@ -79,16 +95,44 @@ export class SubmitInspectionReportUseCase extends BaseUseCase<
 
     const updated = await this.inspections.update(inspectionId, {
       status: passed ? InspectionStatus.PASSED : InspectionStatus.FAILED,
-      report: { ...report, sections, submittedAt: new Date() } as InspectionReport,
+      report: {
+        ...report,
+        sections,
+        submittedAt: new Date(),
+      },
     });
 
     if (!passed) {
-      await this.listings.setStatus(
-        inspection.listingId,
-        ListingStatus.FAILED,
-      );
+      await this.listings.setStatus(inspection.listingId, ListingStatus.FAILED);
     }
 
+    /* The outcome the dealer paid to find out. Not awaited: the inspector is
+       filing a report and must not be blocked by, or fail on, mail. */
+    this.notifyBuyer(updated, passed);
+
     return updated;
+  }
+
+  private async notifyBuyer(
+    inspection: Inspection,
+    passed: boolean,
+  ): Promise<void> {
+    const facts = await inspectionMailFacts(
+      { users: this.users, listings: this.listings },
+      inspection,
+    );
+    if (!facts) return;
+
+    await this.mail.send(
+      passed
+        ? inspectionPassedTemplate({
+            ...facts,
+            fee: inspection.fee,
+            /* The hold IS the decision window: when it lapses the car goes
+               back on the market, whatever the dealer intended. */
+            decideBy: inspection.reservedUntil,
+          })
+        : inspectionFailedTemplate({ ...facts, fee: inspection.fee }),
+    );
   }
 }

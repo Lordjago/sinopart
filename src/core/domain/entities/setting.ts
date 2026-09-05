@@ -36,7 +36,7 @@ export interface SettingDefinition {
   description: string;
   type: SettingType;
   /** Groups the panel renders as sections. */
-  group: 'Inspections' | 'Pricing';
+  group: 'Inspections' | 'Pricing' | 'Orders';
   defaultValue: string;
   /** Numbers and rates only. */
   min?: number;
@@ -57,6 +57,7 @@ export const SETTING_KEYS = {
   FREIGHT_INSURANCE: 'pricing.freight_insurance_ngn',
   SINOPART_FEE_RATE: 'pricing.sinopart_fee_rate',
   DUTY_RATE: 'pricing.duty_rate',
+  ESCROW_RELEASE_PCT: 'orders.escrow_release_pct',
 } as const;
 
 /**
@@ -139,6 +140,19 @@ export const SETTING_DEFINITIONS: readonly SettingDefinition[] = [
     min: 0,
     max: 1,
     unit: '%',
+    public: false,
+  },
+  {
+    key: SETTING_KEYS.ESCROW_RELEASE_PCT,
+    label: "Escrow release on loading",
+    description:
+      "The share of a purchase that reaches the store once loading is VIN-verified. The remainder is held back until the dealer confirms the car, which is what gives the VIN check its teeth.",
+    type: "rate",
+    group: "Orders",
+    defaultValue: "0.85",
+    min: 0,
+    max: 1,
+    unit: "%",
     public: false,
   },
 ];

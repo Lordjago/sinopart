@@ -34,6 +34,8 @@ import { InspectionController } from './controllers/inspection.controller';
 import { SavedListingController } from './controllers/saved-listing.controller';
 import { CheckoutController } from './controllers/checkout.controller';
 import { ConfigController } from './controllers/config.controller';
+import { OrderController } from './controllers/order.controller';
+import { AdminOrderController } from './controllers/admin-order.controller';
 import { AdminInspectionController } from './controllers/admin-inspection.controller';
 import { DealerKycController } from './controllers/dealer-kyc.controller';
 import { AdminDealerKycController } from './controllers/admin-dealer-kyc.controller';
@@ -67,6 +69,8 @@ import { AdminDealerKycController } from './controllers/admin-dealer-kyc.control
     SavedListingController,
     CheckoutController,
     ConfigController,
+    OrderController,
+    AdminOrderController,
     AdminInspectionController,
     // A dealer verifying themselves. Sits on its own 'kyc' prefix.
     DealerKycController,

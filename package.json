@@ -21,6 +21,7 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
+    "mail:preview": "ts-node -P tsconfig.json scripts/render-mail.ts",
     "seed:catalog": "ts-node -P tsconfig.json scripts/seed-catalog.ts"
   },
   "dependencies": {
@@ -41,7 +42,8 @@
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "tencentcloud-sdk-nodejs-sms": "^4.1.305"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",

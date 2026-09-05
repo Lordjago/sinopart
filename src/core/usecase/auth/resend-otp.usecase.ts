@@ -18,7 +18,7 @@ import type { OtpRepository } from '../../interfaces/repository/otp.repository';
 import type { AuthenticationService } from '../../interfaces/services/authentication.service';
 import type { MailService } from '../../interfaces/services/mail.service';
 import { otpTemplate } from '../../mail/otp.template';
-import { OTP_TTL_MINUTES } from '../../domain/entities/otp';
+import { OTP_TTL_MINUTES, OtpPurpose } from '../../domain/entities/otp';
 import { ValidationError } from '../../errors/validation.error';
 import type { CodeTokenDto } from '../../../application/dtos/otp/code-token.dto';
 import { generateOtpCode } from '../../utils';
@@ -37,9 +37,20 @@ export class ResendOtpUseCase extends BaseUseCase<CodeTokenDto, CodeTokenDto> {
   async execute(dto: CodeTokenDto): Promise<CodeTokenDto> {
     const otp = await this.otpRepository.findByCodeToken(dto.codeToken);
 
-    if (!otp || otp.consumedAt) {
+    /* This message reaches the user verbatim, and the same endpoint backs two
+       very different screens. Telling someone half-way through signing up that
+       their "reset request" expired describes something they never did, so the
+       copy follows the purpose. An unknown token has no purpose to read. */
+    if (!otp) {
       throw new ValidationError(
-        'This reset request is no longer valid. Please start again.',
+        'That request is no longer valid. Please start again.',
+      );
+    }
+    if (otp.consumedAt) {
+      throw new ValidationError(
+        otp.purpose === OtpPurpose.EMAIL_VERIFICATION
+          ? 'That code has already been used. Start again to get a new one.'
+          : 'This reset request is no longer valid. Please start again.',
       );
     }
 
@@ -56,6 +67,7 @@ export class ResendOtpUseCase extends BaseUseCase<CodeTokenDto, CodeTokenDto> {
         code,
         purpose: otp.purpose,
         expiresInMinutes: OTP_TTL_MINUTES,
+        resend: true,
       }),
     );
 

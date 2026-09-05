@@ -49,7 +49,10 @@ export interface PublicStoreView {
 }
 
 @Injectable()
-export class GetPublicStoreUseCase extends BaseUseCase<string, PublicStoreView> {
+export class GetPublicStoreUseCase extends BaseUseCase<
+  string,
+  PublicStoreView
+> {
   constructor(
     @Inject(SUPPLIER_REPOSITORY)
     private readonly suppliers: SupplierRepository,

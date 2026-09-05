@@ -21,6 +21,7 @@ import {
   INVITATION_REPOSITORY,
   INSPECTION_REPOSITORY,
   SAVED_LISTING_REPOSITORY,
+  ORDER_REPOSITORY,
   SETTING_REPOSITORY,
   LISTING_REPOSITORY,
   OTP_REPOSITORY,
@@ -60,6 +61,8 @@ import { SavedListingSchema } from './mongoose/documents/saved-listing.document'
 import { SavedListingRepositoryImpl } from './mongoose/repositories/saved-listing.repository.impl';
 import { SettingSchema } from './mongoose/documents/setting.document';
 import { SettingRepositoryImpl } from './mongoose/repositories/setting.repository.impl';
+import { OrderSchema } from './mongoose/documents/order.document';
+import { OrderRepositoryImpl } from './mongoose/repositories/order.repository.impl';
 import { ServiceModule } from '../services/service.module';
 
 @Module({
@@ -95,6 +98,7 @@ import { ServiceModule } from '../services/service.module';
       { name: 'dealerkycs', schema: DealerKycSchema },
       { name: 'saved_listings', schema: SavedListingSchema },
       { name: 'settings', schema: SettingSchema },
+      { name: 'orders', schema: OrderSchema },
     ]),
     // For FieldCipher, injected into SupplierRepositoryImpl to encrypt bank
     // account numbers at rest.
@@ -114,6 +118,7 @@ import { ServiceModule } from '../services/service.module';
     { provide: INSPECTION_REPOSITORY, useClass: InspectionRepositoryImpl },
     { provide: SAVED_LISTING_REPOSITORY, useClass: SavedListingRepositoryImpl },
     { provide: SETTING_REPOSITORY, useClass: SettingRepositoryImpl },
+    { provide: ORDER_REPOSITORY, useClass: OrderRepositoryImpl },
     { provide: DEALER_KYC_REPOSITORY, useClass: DealerKycRepositoryImpl },
   ],
   // Exporting the tokens (and MongooseModule) lets other modules depend on the
@@ -133,6 +138,7 @@ import { ServiceModule } from '../services/service.module';
     INSPECTION_REPOSITORY,
     SAVED_LISTING_REPOSITORY,
     SETTING_REPOSITORY,
+    ORDER_REPOSITORY,
     DEALER_KYC_REPOSITORY,
   ],
 })

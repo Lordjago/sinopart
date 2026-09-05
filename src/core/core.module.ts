@@ -100,6 +100,15 @@ import {
   UnsaveListingUseCase,
 } from './usecase/saved/saved-listing.usecases';
 import { GetInspectionCheckoutUseCase } from './usecase/checkout/get-inspection-checkout.usecase';
+import { GetPurchaseCheckoutUseCase } from './usecase/checkout/get-purchase-checkout.usecase';
+import { PurchaseListingUseCase } from './usecase/order/purchase-listing.usecase';
+import {
+  AdvanceOrderUseCase,
+  ConfirmDeliveryUseCase,
+  GetOrderUseCase,
+  ListOrdersUseCase,
+  MarkOrderPreparedUseCase,
+} from './usecase/order/order.usecases';
 import { SettingsService } from './usecase/config/settings.service';
 import {
   GetPublicConfigUseCase,
@@ -233,6 +242,15 @@ const useCases = [
 
   // checkout
   GetInspectionCheckoutUseCase,
+  GetPurchaseCheckoutUseCase,
+
+  // orders (purchase and fulfilment)
+  PurchaseListingUseCase,
+  ListOrdersUseCase,
+  GetOrderUseCase,
+  AdvanceOrderUseCase,
+  ConfirmDeliveryUseCase,
+  MarkOrderPreparedUseCase,
 
   // configuration
   SettingsService,

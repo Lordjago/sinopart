@@ -11,14 +11,24 @@
  * The declining store owes a reason. It is the only thing the buyer will see
  * to explain why their paid inspection went nowhere.
  */
+/* eslint-disable @typescript-eslint/no-floating-promises */
 import { Inject, Injectable } from '@nestjs/common';
 import { BaseUseCase } from '../base.usecase';
 import {
   INSPECTION_REPOSITORY,
   LISTING_REPOSITORY,
+  MAIL_SERVICE,
+  USER_REPOSITORY,
 } from '../../injection.token';
 import type { InspectionRepository } from '../../interfaces/repository/inspection.repository';
 import type { ListingRepository } from '../../interfaces/repository/listing.repository';
+import type { UserRepository } from '../../interfaces/repository/user.repository';
+import type { MailService } from '../../interfaces/services/mail.service';
+import {
+  inspectionAcceptedTemplate,
+  inspectionDeclinedTemplate,
+} from '../../mail/inspection.template';
+import { inspectionMailFacts } from './inspection-mail';
 import {
   AWAITING_SUPPLIER,
   InspectionStatus,
@@ -46,6 +56,10 @@ export class RespondInspectionUseCase extends BaseUseCase<
     private readonly inspections: InspectionRepository,
     @Inject(LISTING_REPOSITORY)
     private readonly listings: ListingRepository,
+    @Inject(USER_REPOSITORY)
+    private readonly users: UserRepository,
+    @Inject(MAIL_SERVICE)
+    private readonly mail: MailService,
   ) {
     super();
   }
@@ -57,9 +71,7 @@ export class RespondInspectionUseCase extends BaseUseCase<
       throw new ForbiddenError('This inspection belongs to another store.');
     }
     if (!AWAITING_SUPPLIER.has(inspection.status)) {
-      throw new ValidationError(
-        'This inspection has already been answered.',
-      );
+      throw new ValidationError('This inspection has already been answered.');
     }
     if (!input.accept && !input.note?.trim()) {
       throw new ValidationError(
@@ -83,6 +95,32 @@ export class RespondInspectionUseCase extends BaseUseCase<
       );
     }
 
+    /* Tell the buyer either way. This is the answer they have been waiting on
+       since they paid, so it is the one email in this flow they actually need.
+       Not awaited: the store's click must not hang on our mail transport. */
+    this.notifyBuyer(updated, input.accept);
+
     return updated;
+  }
+
+  private async notifyBuyer(
+    inspection: Inspection,
+    accepted: boolean,
+  ): Promise<void> {
+    const facts = await inspectionMailFacts(
+      { users: this.users, listings: this.listings },
+      inspection,
+    );
+    if (!facts) return;
+
+    await this.mail.send(
+      accepted
+        ? inspectionAcceptedTemplate(facts)
+        : inspectionDeclinedTemplate({
+            ...facts,
+            fee: inspection.fee,
+            supplierNote: inspection.supplierNote,
+          }),
+    );
   }
 }

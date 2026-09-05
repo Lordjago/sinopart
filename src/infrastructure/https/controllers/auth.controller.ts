@@ -16,7 +16,7 @@
  *   POST /auth/resend-otp       (public) -> rotate + resend the code
  *   POST /auth/reset-password   (public) -> set the new password
  */
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Headers, Post } from '@nestjs/common';
 import { Public } from '../decorator/is-public.decorator';
 import { CurrentUser } from '../decorator/current-user.decorator';
 import type { AuthUser } from '../../../core/domain/value-object/auth-user';
@@ -60,8 +60,9 @@ export class AuthController {
 
   @Public()
   @Post('login')
-  login(@Body() dto: LoginDto) {
-    return this.authenticateUser.execute(dto);
+  login(@Body() dto: LoginDto, @Headers('user-agent') userAgent?: string) {
+    // The user agent only travels so the sign-in notice can name the device.
+    return this.authenticateUser.execute({ ...dto, userAgent });
   }
 
   // Stateless JWTs have nothing to invalidate server-side; the client discards

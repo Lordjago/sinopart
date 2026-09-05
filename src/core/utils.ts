@@ -36,9 +36,10 @@ export function generateCodeToken(): string {
 export function generateInvitationCode(): string {
   const ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
   const group = () =>
-    Array.from({ length: 4 }, () => ALPHABET[randomInt(0, ALPHABET.length)]).join(
-      '',
-    );
+    Array.from(
+      { length: 4 },
+      () => ALPHABET[randomInt(0, ALPHABET.length)],
+    ).join('');
   return `SINO-${group()}-${group()}`;
 }
 
@@ -97,4 +98,50 @@ export function convertToQuery(
     }
   }
   return query;
+}
+
+/**
+ * A user agent string, reduced to something a person recognises.
+ *
+ * Deliberately crude. A full UA-parsing library is a large dependency and a
+ * standing maintenance cost, and this text has exactly one job: let someone
+ * reading a security email decide "yes, that was me on my laptop". Getting the
+ * browser and the OS right is enough for that; getting the version right is
+ * not worth a dependency.
+ *
+ * Order matters below. Edge announces itself as Chrome and Safari, and Chrome
+ * announces itself as Safari, so the most specific match has to win.
+ */
+export function describeUserAgent(userAgent?: string): string | undefined {
+  if (!userAgent?.trim()) return undefined;
+
+  const ua = userAgent;
+  const browser = /\bEdgA?\//.test(ua)
+    ? 'Edge'
+    : /\bOPR\/|\bOpera\b/.test(ua)
+      ? 'Opera'
+      : /\bFirefox\//.test(ua)
+        ? 'Firefox'
+        : /\bChrome\//.test(ua)
+          ? 'Chrome'
+          : /\bSafari\//.test(ua)
+            ? 'Safari'
+            : null;
+
+  const os = /\biPhone\b/.test(ua)
+    ? 'iPhone'
+    : /\biPad\b/.test(ua)
+      ? 'iPad'
+      : /\bAndroid\b/.test(ua)
+        ? 'Android'
+        : /\bWindows\b/.test(ua)
+          ? 'Windows'
+          : /\bMac OS X\b/.test(ua)
+            ? 'Mac'
+            : /\bLinux\b/.test(ua)
+              ? 'Linux'
+              : null;
+
+  if (browser && os) return `${browser} on ${os}`;
+  return browser ?? os ?? undefined;
 }

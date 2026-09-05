@@ -45,6 +45,11 @@ export class InspectionMapper {
             label: s.label,
             state: s.state,
             note: normalizeSectionNote(s.note),
+            /* The heading this row sits under. Declared on the entity and
+               stored by Mongo, but dropped here, so the buyer's sheet fell
+               back to one "Checks carried out" bucket however the inspector
+               filed it. */
+            group: s.group ?? null,
           }))
         : [],
       photos: Array.isArray(raw.photos) ? raw.photos : [],

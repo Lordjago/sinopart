@@ -157,9 +157,8 @@ export function toDealerKycSubmissionView(
     approvedCount: documents.filter(
       (d) => d.state === KycDocumentStatus.APPROVED,
     ).length,
-    pendingCount: documents.filter(
-      (d) => d.state === KycDocumentStatus.PENDING,
-    ).length,
+    pendingCount: documents.filter((d) => d.state === KycDocumentStatus.PENDING)
+      .length,
     fullyApproved: allDealerDocumentsApproved(kyc),
     verified: Boolean(user?.verified),
   };

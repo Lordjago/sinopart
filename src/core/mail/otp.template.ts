@@ -1,69 +1,108 @@
 import { OtpPurpose } from '../domain/entities/otp';
 import type { Email } from '../interfaces/services/mail.service';
-import { BRAND, escapeHtml, heading, layout, paragraph } from './layout';
+import { codePanel, escapeHtml, heading, layout, paragraph } from './layout';
 
 export interface SendOtpCodeInput {
   to: string;
   code: string;
   purpose: OtpPurpose;
   expiresInMinutes: number;
+  /**
+   * A resend says so in the copy. Same code panel, different reassurance:
+   * someone who taps "resend" is usually worried the first mail went missing,
+   * and the useful thing to tell them is that both codes work.
+   */
+  resend?: boolean;
 }
 
-const COPY: Record<
-  OtpPurpose,
-  { subject: string; title: string; lead: string }
-> = {
-  [OtpPurpose.PASSWORD_RESET]: {
-    subject: 'Your SinoPart password reset code',
-    title: 'Reset your password',
-    lead: 'Use the code below to finish resetting your password.',
-  },
+interface OtpCopy {
+  /** Takes the code so the subject can lead with it: it is read in a list. */
+  subject: (code: string) => string;
+  preheader: (expiresInMinutes: number) => string;
+  title: string;
+  lead: string;
+  footnote: (expiresInMinutes: number) => string;
+}
+
+/**
+ * Copy per purpose, and per first-send vs resend where the two differ.
+ *
+ * Keyed by purpose first because that is what the OTP record carries. The
+ * resend variant sits underneath it and is optional: a purpose without one
+ * falls back to its first-send copy.
+ */
+const COPY: Record<OtpPurpose, { first: OtpCopy; resend?: OtpCopy }> = {
   [OtpPurpose.EMAIL_VERIFICATION]: {
-    subject: 'Verify your SinoPart email',
-    title: 'Verify your email',
-    lead: 'Use the code below to confirm this email address.',
+    // D01
+    first: {
+      subject: (code) => `${code} is your SinoPart verification code`,
+      preheader: (mins) =>
+        `Enter it to finish signing up. It expires in ${mins} minutes.`,
+      title: 'Confirm your email',
+      lead: 'Enter this code to finish setting up your account.',
+      footnote: (mins) =>
+        `It expires in ${mins} minutes. If you did not sign up for SinoPart, ignore this email.`,
+    },
+    // D02
+    resend: {
+      subject: (code) => `${code} is your SinoPart verification code`,
+      preheader: (mins) => `Here it is again. It expires in ${mins} minutes.`,
+      title: 'Here is your code again',
+      lead: 'Enter this code to finish setting up your account.',
+      footnote: (mins) =>
+        `It expires in ${mins} minutes. If the first email arrives later, both codes are the same.`,
+    },
   },
+
+  [OtpPurpose.PASSWORD_RESET]: {
+    // D04
+    first: {
+      subject: (code) => `${code} is your SinoPart password reset code`,
+      preheader: (mins) =>
+        `It expires in ${mins} minutes. Ignore this if you did not ask.`,
+      title: 'Reset your password',
+      lead: 'Use this code to set a new password.',
+      footnote: (mins) =>
+        `It expires in ${mins} minutes and works once. If you did not ask to reset your password, ignore this email and your password stays as it is.`,
+    },
+  },
+
   // Phone verification is delivered by SMS, not email, so this entry only
   // satisfies the exhaustive Record type; it is never actually rendered.
   [OtpPurpose.PHONE_VERIFICATION]: {
-    subject: 'Your SinoPart verification code',
-    title: 'Verify your phone',
-    lead: 'Use the code below to confirm your phone number.',
+    first: {
+      subject: (code) => `${code} is your SinoPart verification code`,
+      preheader: (mins) => `It expires in ${mins} minutes.`,
+      title: 'Verify your phone',
+      lead: 'Enter this code to confirm your phone number.',
+      footnote: (mins) => `It expires in ${mins} minutes.`,
+    },
   },
 };
 
 export function otpTemplate(input: SendOtpCodeInput): Email {
-  const { to, code, purpose, expiresInMinutes } = input;
-  const copy = COPY[purpose];
+  const { to, code, purpose, expiresInMinutes, resend } = input;
+
+  const variants = COPY[purpose];
+  const copy = (resend && variants.resend) || variants.first;
 
   const body = `
-    ${heading(copy.title)}
-    ${paragraph(escapeHtml(copy.lead))}
-
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:24px 0;">
-      <tr>
-        <td align="center" style="padding:20px;background:${BRAND.panel};border:1px solid ${BRAND.line};border-radius:8px;">
-          <div style="font-family:'Courier New',Courier,monospace;font-size:34px;font-weight:700;letter-spacing:9px;color:${BRAND.ink};">
-            ${escapeHtml(code)}
-          </div>
-        </td>
-      </tr>
-    </table>
-
-    ${paragraph(`This code expires in <strong>${escapeHtml(expiresInMinutes)} minutes</strong>.`)}
-    ${paragraph(
-      `<span style="color:${BRAND.muted};font-size:14px;">If you did not request this, you can safely ignore this email. Nothing changes until the code is used.</span>`,
-    )}
+      ${heading(copy.title)}
+      ${paragraph(escapeHtml(copy.lead))}
+      ${codePanel(code)}
+      ${paragraph(escapeHtml(copy.footnote(expiresInMinutes)), 0)}
   `;
+
+  // The code is in the subject, so the preheader is free to say what to do
+  // with it rather than repeating it.
+  const subject = copy.subject(code);
 
   return {
     to,
-    subject: copy.subject,
-    // The code goes in the preheader too, so it is readable from the inbox list
-    // without opening the mail.
+    subject,
     html: layout({
-      title: copy.subject,
-      preheader: `${code}. Expires in ${expiresInMinutes} minutes`,
+      title: subject,
+      preheader: copy.preheader(expiresInMinutes),
       body,
     }),
     tag: 'otp',

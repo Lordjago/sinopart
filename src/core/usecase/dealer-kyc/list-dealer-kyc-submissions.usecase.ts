@@ -58,7 +58,9 @@ export class ListDealerKycSubmissionsUseCase extends BaseUseCase<
   private async usersById(ids: string[]): Promise<Map<string, User>> {
     const unique = [...new Set(ids)].filter(Boolean);
     if (!unique.length) return new Map();
-    const found = await Promise.all(unique.map((id) => this.users.findById(id)));
+    const found = await Promise.all(
+      unique.map((id) => this.users.findById(id)),
+    );
     return new Map(
       found.filter((u): u is User => Boolean(u)).map((u) => [u._id!, u]),
     );

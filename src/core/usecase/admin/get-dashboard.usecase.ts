@@ -64,14 +64,19 @@ export class GetDashboardUseCase extends BaseUseCase<void, DashboardSummary> {
   }
 
   async execute(): Promise<DashboardSummary> {
-    const [byRole, supplierByStatus, listingByStatus, invitationByStatus, queue] =
-      await Promise.all([
-        this.users.countByRole(),
-        this.suppliers.countByStatus(),
-        this.listings.countByStatus(),
-        this.invitations.countByStatus(),
-        this.suppliers.findAll({ withKycOnly: true, page: 1, limit: 5 }),
-      ]);
+    const [
+      byRole,
+      supplierByStatus,
+      listingByStatus,
+      invitationByStatus,
+      queue,
+    ] = await Promise.all([
+      this.users.countByRole(),
+      this.suppliers.countByStatus(),
+      this.listings.countByStatus(),
+      this.invitations.countByStatus(),
+      this.suppliers.findAll({ withKycOnly: true, page: 1, limit: 5 }),
+    ]);
 
     const sum = (counts: Record<string, number>) =>
       Object.values(counts).reduce((total, n) => total + n, 0);

@@ -83,7 +83,9 @@ export class UploadDealerKycDocumentUseCase extends BaseUseCase<
       throw new ValidationError('That file is too large. The limit is 10MB.');
     }
     if (!ALLOWED_MIME.has(input.mimeType)) {
-      throw new ValidationError('Upload a PDF or an image (JPG, PNG, or WebP).');
+      throw new ValidationError(
+        'Upload a PDF or an image (JPG, PNG, or WebP).',
+      );
     }
 
     const existing = await this.dealerKyc.ensureForUser(input.userId);

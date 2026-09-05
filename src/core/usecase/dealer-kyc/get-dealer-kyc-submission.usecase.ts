@@ -29,7 +29,9 @@ export class GetDealerKycSubmissionUseCase extends BaseUseCase<
   async execute(userId: string): Promise<DealerKycSubmissionView> {
     const kyc = await this.dealerKyc.findByUserId(userId);
     if (!kyc) {
-      throw new ResourceNotFoundError('This dealer has not started verification.');
+      throw new ResourceNotFoundError(
+        'This dealer has not started verification.',
+      );
     }
     const user = await this.users.findById(userId);
     return toDealerKycSubmissionView(kyc, user);

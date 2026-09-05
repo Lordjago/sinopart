@@ -70,9 +70,7 @@ export class UploadListingVideoUseCase extends BaseUseCase<
       );
     }
     if (!ALLOWED_MIME.has(input.mimeType)) {
-      throw new ValidationError(
-        'Upload a video file (MP4, MOV, WebM or 3GP).',
-      );
+      throw new ValidationError('Upload a video file (MP4, MOV, WebM or 3GP).');
     }
 
     const stored = await this.storage.store({

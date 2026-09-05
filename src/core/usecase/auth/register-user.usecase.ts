@@ -48,8 +48,8 @@ export class RegisterUserUseCase extends BaseUseCase<
       passwordHash,
       role: UserRole.BUYER,
       tier: UserTier.TIER_1,
-      verified: false, 
-      emailVerified: false, 
+      verified: false,
+      emailVerified: false,
     };
 
     const user = await this.userRepository.create(toCreate);

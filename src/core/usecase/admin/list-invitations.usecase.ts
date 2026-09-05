@@ -60,9 +60,7 @@ export class ListInvitationsUseCase extends BaseUseCase<
     const issuerNames = await this.resolveIssuers(found.data);
 
     return new Page(
-      found.data.map((invite) =>
-        this.toView(invite, storeNames, issuerNames),
-      ),
+      found.data.map((invite) => this.toView(invite, storeNames, issuerNames)),
       found.page,
       found.limit,
       found.total,

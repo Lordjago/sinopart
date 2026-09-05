@@ -86,6 +86,11 @@ export class SettingsService {
     return this.number(SETTING_KEYS.INSPECTION_FEE);
   }
 
+  /** What share of a purchase reaches the store when loading is verified. */
+  async escrowReleasePct(): Promise<number> {
+    return this.number(SETTING_KEYS.ESCROW_RELEASE_PCT);
+  }
+
   async reservationHours(): Promise<number> {
     return this.number(SETTING_KEYS.RESERVATION_HOURS);
   }

@@ -83,6 +83,9 @@ export class UploadInspectionEvidenceUseCase extends BaseUseCase<
       folder: `inspections/${input.inspectionId}/evidence`,
     });
 
-    return { url: stored.url, kind: isVideo ? ('video' as const) : ('photo' as const) };
+    return {
+      url: stored.url,
+      kind: isVideo ? ('video' as const) : ('photo' as const),
+    };
   }
 }

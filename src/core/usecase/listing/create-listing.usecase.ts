@@ -121,7 +121,7 @@ export class CreateListingUseCase extends BaseUseCase<
       photos: fields.photos ?? [],
       videos: fields.videos ?? [],
       submittedAt: status === ListingStatus.SUBMITTED ? new Date() : null,
-    } as Listing;
+    };
 
     return this.listings.create(listing);
   }

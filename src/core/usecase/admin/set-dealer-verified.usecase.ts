@@ -29,9 +29,7 @@ export class SetDealerVerifiedUseCase extends BaseUseCase<
   SetDealerVerifiedInput,
   PublicUser
 > {
-  constructor(
-    @Inject(USER_REPOSITORY) private readonly users: UserRepository,
-  ) {
+  constructor(@Inject(USER_REPOSITORY) private readonly users: UserRepository) {
     super();
   }
 

@@ -41,10 +41,7 @@ export interface GetUserInput {
 }
 
 @Injectable()
-export class GetUserUseCase extends BaseUseCase<
-  GetUserInput,
-  UserDetailView
-> {
+export class GetUserUseCase extends BaseUseCase<GetUserInput, UserDetailView> {
   constructor(
     @Inject(USER_REPOSITORY) private readonly users: UserRepository,
     @Inject(SUPPLIER_REPOSITORY) private readonly suppliers: SupplierRepository,
@@ -55,7 +52,9 @@ export class GetUserUseCase extends BaseUseCase<
 
   async execute({ source, id }: GetUserInput): Promise<UserDetailView> {
     if (source !== 'user' && source !== 'supplier') {
-      throw new ValidationError("Unknown directory source: expected 'user' or 'supplier'.");
+      throw new ValidationError(
+        "Unknown directory source: expected 'user' or 'supplier'.",
+      );
     }
     return source === 'supplier'
       ? this.supplierDetail(id)

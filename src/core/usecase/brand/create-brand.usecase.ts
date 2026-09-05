@@ -42,6 +42,6 @@ export class CreateBrandUseCase extends BaseUseCase<CreateBrandInput, Brand> {
       name,
       description: input.description?.trim() || undefined,
       logo: input.logo || undefined,
-    } as Brand);
+    });
   }
 }

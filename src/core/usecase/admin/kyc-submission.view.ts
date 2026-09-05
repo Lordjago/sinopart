@@ -69,9 +69,8 @@ export function toKycSubmissionView(supplier: Supplier): KycSubmissionView {
     approvedCount: documents.filter(
       (d) => d.state === KycDocumentStatus.APPROVED,
     ).length,
-    pendingCount: documents.filter(
-      (d) => d.state === KycDocumentStatus.PENDING,
-    ).length,
+    pendingCount: documents.filter((d) => d.state === KycDocumentStatus.PENDING)
+      .length,
     fullyApproved: allDocumentsApproved(supplier),
   };
 }

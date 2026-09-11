@@ -18,9 +18,8 @@
  * The two sets are deliberately distinct rather than shared. A store proves it
  * is a real business trading from a real yard; a dealer proves they are a real
  * person who controls a real bank account. "Identity" means a passport page for
- * a supplier and a liveness selfie matched against a BVN for a dealer, and
- * collapsing those onto one member would leave a reviewer unsure which they are
- * looking at. Which set applies is decided by REQUIRED_KYC_DOCUMENTS vs
+ * a supplier; a dealer proves theirs against the BVN/NIN registry instead of by
+ * uploading anything. Which set applies is decided by REQUIRED_KYC_DOCUMENTS vs
  * REQUIRED_DEALER_KYC_DOCUMENTS, never by reading the member names.
  */
 export enum KycDocumentType {
@@ -42,11 +41,18 @@ export const REQUIRED_KYC_DOCUMENTS: KycDocumentType[] = [
   KycDocumentType.STORE_PHOTO,
 ];
 
-/** The same contract for a dealer: what must be on file before they can buy. */
+/**
+ * The same contract for a dealer: what must be on file before they can buy.
+ *
+ * LIVENESS was dropped from this list: the dealer's identity is now proven
+ * against the BVN/NIN registry itself, which is a stronger check than a selfie
+ * nobody was face-matching. The enum member stays so documents captured before
+ * that change remain readable — they are simply no longer required, no longer
+ * rendered, and no longer uploadable.
+ */
 export const REQUIRED_DEALER_KYC_DOCUMENTS: KycDocumentType[] = [
   KycDocumentType.CAC_CERTIFICATE,
   KycDocumentType.PROOF_OF_ADDRESS,
-  KycDocumentType.LIVENESS,
 ];
 
 /**

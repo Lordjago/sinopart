@@ -18,6 +18,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import {
   BRAND_REPOSITORY,
   DEALER_KYC_REPOSITORY,
+  IDENTITY_VERIFICATION_REPOSITORY,
   INVITATION_REPOSITORY,
   INSPECTION_REPOSITORY,
   SAVED_LISTING_REPOSITORY,
@@ -57,6 +58,8 @@ import { InspectionSchema } from './mongoose/documents/inspection.document';
 import { InspectionRepositoryImpl } from './mongoose/repositories/inspection.repository.impl';
 import { DealerKycSchema } from './mongoose/documents/dealer-kyc.document';
 import { DealerKycRepositoryImpl } from './mongoose/repositories/dealer-kyc.repository.impl';
+import { IdentityVerificationSchema } from './mongoose/documents/identity-verification.document';
+import { IdentityVerificationRepositoryImpl } from './mongoose/repositories/identity-verification.repository.impl';
 import { SavedListingSchema } from './mongoose/documents/saved-listing.document';
 import { SavedListingRepositoryImpl } from './mongoose/repositories/saved-listing.repository.impl';
 import { SettingSchema } from './mongoose/documents/setting.document';
@@ -96,6 +99,7 @@ import { ServiceModule } from '../services/service.module';
       // A dealer's verification file. Its own collection rather than fields on
       // the user: a BVN and a home address must not ride along in the JWT.
       { name: 'dealerkycs', schema: DealerKycSchema },
+      { name: 'identity_verifications', schema: IdentityVerificationSchema },
       { name: 'saved_listings', schema: SavedListingSchema },
       { name: 'settings', schema: SettingSchema },
       { name: 'orders', schema: OrderSchema },
@@ -120,6 +124,10 @@ import { ServiceModule } from '../services/service.module';
     { provide: SETTING_REPOSITORY, useClass: SettingRepositoryImpl },
     { provide: ORDER_REPOSITORY, useClass: OrderRepositoryImpl },
     { provide: DEALER_KYC_REPOSITORY, useClass: DealerKycRepositoryImpl },
+    {
+      provide: IDENTITY_VERIFICATION_REPOSITORY,
+      useClass: IdentityVerificationRepositoryImpl,
+    },
   ],
   // Exporting the tokens (and MongooseModule) lets other modules depend on the
   // storage ports without knowing the concrete adapters.
@@ -140,6 +148,7 @@ import { ServiceModule } from '../services/service.module';
     SETTING_REPOSITORY,
     ORDER_REPOSITORY,
     DEALER_KYC_REPOSITORY,
+    IDENTITY_VERIFICATION_REPOSITORY,
   ],
 })
 export class DatabaseModule {}

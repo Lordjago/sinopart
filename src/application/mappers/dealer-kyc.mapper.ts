@@ -1,5 +1,8 @@
 import type { DealerKyc } from '../../core/domain/entities/dealer-kyc';
-import { DealerKycStatus } from '../../core/domain/entities/dealer-kyc';
+import {
+  DealerKycStatus,
+  IdVerificationStatus,
+} from '../../core/domain/entities/dealer-kyc';
 
 /**
  * Document ⇄ entity for a dealer's verification file.
@@ -21,8 +24,33 @@ export class DealerKycMapper {
       status: raw.status ?? DealerKycStatus.DRAFT,
       idType: raw.idType ?? null,
       idLast4: raw.idLast4 ?? null,
-      businessName: raw.businessName ?? null,
-      rcNumber: raw.rcNumber ?? null,
+      idVerificationStatus:
+        raw.idVerificationStatus ?? IdVerificationStatus.UNVERIFIED,
+      idVerifiedAt: raw.idVerifiedAt ?? null,
+      idVerificationRef: raw.idVerificationRef ?? null,
+      // Rows written before `business` existed have only the flat columns, so
+      // compose the sub-document from them. Every read path therefore sees the
+      // same shape regardless of when the row was written, and no migration is
+      // needed. The flat fields stay populated for the admin search index.
+      business: raw.business
+        ? {
+            name: raw.business.name ?? raw.businessName ?? null,
+            rcNumber: raw.business.rcNumber ?? raw.rcNumber ?? null,
+            certificateUrl: raw.business.certificateUrl ?? null,
+            certificateFilename: raw.business.certificateFilename ?? null,
+            certificateUploadedAt: raw.business.certificateUploadedAt ?? null,
+          }
+        : raw.businessName || raw.rcNumber
+          ? {
+              name: raw.businessName ?? null,
+              rcNumber: raw.rcNumber ?? null,
+              certificateUrl: null,
+              certificateFilename: null,
+              certificateUploadedAt: null,
+            }
+          : null,
+      businessName: raw.business?.name ?? raw.businessName ?? null,
+      rcNumber: raw.business?.rcNumber ?? raw.rcNumber ?? null,
       address: raw.address
         ? {
             street: raw.address.street ?? '',

@@ -17,11 +17,13 @@ import {
   LISTING_REPOSITORY,
   ORDER_REPOSITORY,
   SUPPLIER_REPOSITORY,
+  USER_REPOSITORY,
 } from '../../injection.token';
 import type { InspectionRepository } from '../../interfaces/repository/inspection.repository';
 import type { ListingRepository } from '../../interfaces/repository/listing.repository';
 import type { OrderRepository } from '../../interfaces/repository/order.repository';
 import type { SupplierRepository } from '../../interfaces/repository/supplier.repository';
+import type { UserRepository } from '../../interfaces/repository/user.repository';
 import { InspectionStatus } from '../../domain/entities/inspection';
 import { buildOrderMoney, type OrderMoney } from '../../domain/entities/order';
 import { fmtNaira, landedPrice } from '../../domain/value-object/landed-price';
@@ -31,7 +33,7 @@ import { SettingsService } from '../config/settings.service';
 import type { CheckoutRow } from './get-inspection-checkout.usecase';
 
 export interface PurchaseCheckoutView {
-  state: 'review' | 'unavailable' | 'paid';
+  state: 'review' | 'unavailable' | 'paid' | 'kyc';
   inspectionId: string;
   listingId: string;
   /** Set once bought, so the screen can send them to the order instead. */
@@ -73,6 +75,8 @@ export class GetPurchaseCheckoutUseCase extends BaseUseCase<
     private readonly orders: OrderRepository,
     @Inject(SUPPLIER_REPOSITORY)
     private readonly suppliers: SupplierRepository,
+    @Inject(USER_REPOSITORY)
+    private readonly users: UserRepository,
     private readonly settings: SettingsService,
   ) {
     super();
@@ -110,23 +114,39 @@ export class GetPurchaseCheckoutUseCase extends BaseUseCase<
       inspection.fee,
     );
 
-    // The same rule the payment enforces, so the screen refuses up front.
+    // The same rules the payment enforces, so the screen refuses up front.
     const passed = inspection.status === InspectionStatus.PASSED;
+
+    // Verification is checked here too. In practice a dealer cannot own a
+    // passed inspection without having been verified to pay for it, but this
+    // screen must not rely on that remaining true — and a dealer un-verified
+    // after the fact should see why, not hit a 403 on submit.
+    const buyer = await this.users.findById(buyerId);
+    const needsKyc = !buyer?.verified;
+
     const reason = existingOrder
       ? 'You have already paid for this car.'
       : !passed
         ? inspection.status === InspectionStatus.FAILED
           ? 'This car failed inspection, so it cannot be bought.'
           : 'The inspection on this car is not finished yet.'
-        : null;
+        : needsKyc
+          ? 'Your account must be verified before you can pay for this car.'
+          : null;
 
     return {
-      state: existingOrder ? 'paid' : passed ? 'review' : 'unavailable',
+      state: existingOrder
+        ? 'paid'
+        : !passed
+          ? 'unavailable'
+          : needsKyc
+            ? 'kyc'
+            : 'review',
       inspectionId,
       listingId: listing._id!,
       orderId: existingOrder?._id ?? null,
 
-      payable: passed && !existingOrder,
+      payable: passed && !existingOrder && !needsKyc,
       reason,
 
       money,

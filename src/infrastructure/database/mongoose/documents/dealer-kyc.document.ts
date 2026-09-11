@@ -13,6 +13,7 @@ import { HydratedDocument } from 'mongoose';
 import {
   DealerIdType,
   DealerKycStatus,
+  IdVerificationStatus,
 } from '../../../../core/domain/entities/dealer-kyc';
 import {
   KycDocumentStatus,
@@ -91,6 +92,31 @@ export class DealerAddressSub {
 }
 const DealerAddressSchema = SchemaFactory.createForClass(DealerAddressSub);
 
+/**
+ * Registered business plus the CAC certificate that evidences it. The
+ * certificate's URL is copied here at upload time so the file and the typed
+ * details a reviewer compares it against travel together.
+ */
+@Schema({ _id: false })
+export class DealerBusinessSub {
+  @Prop({ type: String, default: null, trim: true })
+  name?: string | null;
+
+  @Prop({ type: String, default: null, trim: true })
+  rcNumber?: string | null;
+
+  @Prop({ type: String, default: null })
+  certificateUrl?: string | null;
+
+  @Prop({ type: String, default: null })
+  certificateFilename?: string | null;
+
+  @Prop({ type: Date, default: null })
+  certificateUploadedAt?: Date | null;
+}
+
+const DealerBusinessSchema = SchemaFactory.createForClass(DealerBusinessSub);
+
 @Schema({ collection: 'dealerkycs', timestamps: true })
 export class DealerKycDoc {
   @Prop({ required: true, unique: true, index: true })
@@ -113,6 +139,27 @@ export class DealerKycDoc {
   @Prop({ type: String, default: null })
   idLast4?: string | null;
 
+  // Registry check. Defaults to UNVERIFIED so files written before Dojah
+  // existed read as "never checked" rather than silently as "fine".
+  @Prop({
+    type: String,
+    enum: IdVerificationStatus,
+    default: IdVerificationStatus.UNVERIFIED,
+  })
+  idVerificationStatus?: IdVerificationStatus | null;
+
+  @Prop({ type: Date, default: null })
+  idVerifiedAt?: Date | null;
+
+  @Prop({ type: String, default: null })
+  idVerificationRef?: string | null;
+
+  @Prop({ type: DealerBusinessSchema, default: null })
+  business?: DealerBusinessSub | null;
+
+  // Kept alongside `business` so the admin free-text search ($or over these two
+  // columns) keeps working, and so rows written before `business` existed still
+  // read. The mapper composes `business` from these when it is absent.
   @Prop({ type: String, default: null, trim: true })
   businessName?: string | null;
 

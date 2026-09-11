@@ -36,6 +36,31 @@ export class EnvironmentVariables {
   @IsString()
   @MinLength(1)
   CLOUDINARY_URL: string;
+
+  /**
+   * Key for FieldCipher (BVN/NIN and bank account numbers at rest).
+   *
+   * Declared here so it stops silently falling back to JWT_SECRET. Anything
+   * already encrypted under the old fallback stays decryptable ONLY while this
+   * holds the same value the fallback used — see the note in .env.example
+   * before changing it.
+   */
+  @IsString()
+  @MinLength(16)
+  ENCRYPTION_KEY: string;
+
+  // ----- Dojah (BVN/NIN identity verification) -----
+  @IsString()
+  @MinLength(1)
+  DOJAH_APP_ID: string;
+
+  @IsString()
+  @MinLength(1)
+  DOJAH_PRIVATE_KEY: string;
+
+  @IsString()
+  @MinLength(1)
+  DOJAH_BASE_URL: string;
 }
 
 export function validateEnv(

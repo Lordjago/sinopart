@@ -14,6 +14,7 @@
  */
 import {
   allDealerDocumentsApproved,
+  IdVerificationStatus,
   missingForSubmission,
   type DealerKyc,
   type DealerKycStatus,
@@ -26,12 +27,26 @@ import {
 import type { User } from '../../domain/entities/user';
 import type { KycDocumentView } from '../admin/admin.views';
 
+/** Display-safe business record. Same shape as the entity: nothing sensitive. */
+export interface DealerBusinessView {
+  name: string | null;
+  rcNumber: string | null;
+  certificateUrl: string | null;
+  certificateFilename: string | null;
+  certificateUploadedAt: Date | null;
+}
+
 export interface DealerKycStatusView {
   status: DealerKycStatus;
   idType: string | null;
   idLast4: string | null;
+  /** Whether the number was checked against the registry, and when. */
+  idVerificationStatus: IdVerificationStatus;
+  idVerifiedAt: Date | null;
   businessName: string | null;
   rcNumber: string | null;
+  /** The grouped business record, with the CAC certificate bound to it. */
+  business: DealerBusinessView | null;
   address: { street: string; city: string; state: string } | null;
   documents: KycDocumentView[];
   bank: BankAccountView | null;
@@ -52,8 +67,13 @@ export interface DealerKycSubmissionView {
   phone: string | null;
   businessName: string | null;
   rcNumber: string | null;
+  business: DealerBusinessView | null;
   idType: string | null;
   idLast4: string | null;
+  idVerificationStatus: IdVerificationStatus;
+  idVerifiedAt: Date | null;
+  /** Provider reference for the check, so a reviewer can trace it. */
+  idVerificationRef: string | null;
   address: { street: string; city: string; state: string } | null;
   status: DealerKycStatus;
   submittedAt: Date | null;
@@ -71,7 +91,7 @@ export interface DealerKycSubmissionView {
 
 /**
  * Every required document, missing ones included. A reviewer needs to see that
- * the liveness selfie was never sent, not merely fail to find it in a list.
+ * the proof of address was never sent, not merely fail to find it in a list.
  */
 export function toDealerDocumentViews(kyc: DealerKyc): KycDocumentView[] {
   const byType = new Map((kyc.kycDocuments ?? []).map((d) => [d.type, d]));
@@ -117,8 +137,12 @@ export function toDealerKycStatusView(kyc: DealerKyc): DealerKycStatusView {
     status: kyc.status,
     idType: kyc.idType ?? null,
     idLast4: kyc.idLast4 ?? null,
+    idVerificationStatus:
+      kyc.idVerificationStatus ?? IdVerificationStatus.UNVERIFIED,
+    idVerifiedAt: kyc.idVerifiedAt ?? null,
     businessName: kyc.businessName ?? null,
     rcNumber: kyc.rcNumber ?? null,
+    business: kyc.business ?? null,
     address: kyc.address ?? null,
     documents: toDealerDocumentViews(kyc),
     bank: kyc.bankAccount ?? null,
@@ -144,8 +168,13 @@ export function toDealerKycSubmissionView(
     phone: user?.phone || null,
     businessName: kyc.businessName ?? user?.business ?? null,
     rcNumber: kyc.rcNumber ?? null,
+    business: kyc.business ?? null,
     idType: kyc.idType ?? null,
     idLast4: kyc.idLast4 ?? null,
+    idVerificationStatus:
+      kyc.idVerificationStatus ?? IdVerificationStatus.UNVERIFIED,
+    idVerifiedAt: kyc.idVerifiedAt ?? null,
+    idVerificationRef: kyc.idVerificationRef ?? null,
     address: kyc.address ?? null,
     status: kyc.status,
     submittedAt: kyc.submittedAt ?? null,

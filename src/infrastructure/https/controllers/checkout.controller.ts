@@ -4,8 +4,11 @@
  *   GET /checkout/inspection/:listingId  (public) -> fee, terms, cost breakdown
  *
  * Public on purpose: a dealer may read the price and the terms before signing
- * in, and is sent to log in at the point of paying. Nothing returned here is
- * specific to one dealer.
+ * in, and is sent to log in at the point of paying. It is no longer entirely
+ * impersonal though — when a token IS present the screen also reports whether
+ * that dealer may pay, so an unverified one is told before filling anything in
+ * rather than at the point of submission. AuthGuard attaches the user on public
+ * routes when a valid token is there, which is what makes both true at once.
  *
  * The fee this quotes is the same constant StartInspectionUseCase charges. That
  * is the whole reason the endpoint exists.
@@ -28,8 +31,16 @@ export class CheckoutController {
 
   @Public()
   @Get('inspection/:listingId')
-  inspection(@Param('listingId') listingId: string) {
-    return this.inspectionCheckout.execute(listingId);
+  inspection(
+    @CurrentUser() user: AuthUser | undefined,
+    @Param('listingId') listingId: string,
+  ) {
+    // `user` is undefined for a signed-out viewer, which the use case reads as
+    // "do not judge this one" rather than "unverified".
+    return this.inspectionCheckout.execute({
+      listingId,
+      buyerId: user?.id ?? null,
+    });
   }
 
   /**

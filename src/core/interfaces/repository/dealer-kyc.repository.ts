@@ -3,6 +3,7 @@ import type {
   DealerIdType,
   DealerKyc,
   DealerKycStatus,
+  IdVerificationStatus,
 } from '../../domain/entities/dealer-kyc';
 import type {
   BankAccountInput,
@@ -34,6 +35,14 @@ export interface DealerKycDetailsInput {
   businessName?: string;
   rcNumber?: string;
   address?: DealerAddress;
+}
+
+/** The outcome of a registry check, as recorded on the dealer's file. */
+export interface DealerIdVerificationInput {
+  status: IdVerificationStatus;
+  /** Set only when the check passed; clears nothing when it did not. */
+  verifiedAt?: Date | null;
+  reference?: string | null;
 }
 
 /** One reviewer's decision on one of a dealer's documents. */
@@ -69,6 +78,11 @@ export interface DealerKycRepository {
   saveDetails(
     userId: string,
     details: DealerKycDetailsInput,
+  ): Promise<DealerKyc>;
+  /** Record what the registry said about the dealer's id. */
+  saveIdVerification(
+    userId: string,
+    verification: DealerIdVerificationInput,
   ): Promise<DealerKyc>;
   /** Store the payout account, number encrypted at rest, last4 kept for display. */
   saveBankAccount(userId: string, bank: BankAccountInput): Promise<DealerKyc>;

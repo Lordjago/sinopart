@@ -51,6 +51,7 @@ import { ListingStatus } from '../../domain/entities/listing';
 import { landedPrice } from '../../domain/value-object/landed-price';
 import { ResourceNotFoundError } from '../../errors/resource-not-found.error';
 import { ForbiddenError } from '../../errors/forbidden.error';
+import { requireVerifiedDealer } from '../dealer-kyc/require-verified-dealer';
 import { ValidationError } from '../../errors/validation.error';
 import { SettingsService } from '../config/settings.service';
 
@@ -83,6 +84,11 @@ export class PurchaseListingUseCase extends BaseUseCase<
   }
 
   async execute(input: PurchaseListingInput): Promise<Order> {
+    // Same gate as the inspection payment. Reaching here already requires a
+    // passed inspection, which an unverified dealer cannot have paid for — but
+    // this must not depend on that staying true.
+    requireVerifiedDealer(await this.users.findById(input.buyerId));
+
     const inspection = await this.inspections.findById(input.inspectionId);
     if (!inspection) throw new ResourceNotFoundError('Inspection not found.');
     if (inspection.buyerId !== input.buyerId) {

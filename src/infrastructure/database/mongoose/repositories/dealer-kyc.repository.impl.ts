@@ -18,8 +18,10 @@ import type {
   BankAccountInput,
   KycDocument,
 } from '../../../../core/domain/value-object/kyc';
+import { KycDocumentType } from '../../../../core/domain/value-object/kyc';
 import { Page } from '../../../../core/domain/value-object/page';
 import type {
+  DealerIdVerificationInput,
   DealerKycDetailsInput,
   DealerKycFilters,
   DealerKycRepository,
@@ -117,15 +119,49 @@ export class DealerKycRepositoryImpl implements DealerKycRepository {
     const $set: Record<string, unknown> = {};
     if (details.idType !== undefined) $set.idType = details.idType;
     if (details.idNumber !== undefined) {
+      // Encrypt the SAME normalised digits that last4 is taken from. Encrypting
+      // the raw input would let "1234-5678-901" and "12345678901" store as two
+      // different ciphertexts for one identity, with a last4 that matches both.
       const digits = details.idNumber.replace(/\D/g, '');
-      $set.idNumberEnc = this.cipher.encrypt(details.idNumber);
+      $set.idNumberEnc = this.cipher.encrypt(digits);
       $set.idLast4 = digits.slice(-4);
     }
+    // Written to both the grouped sub-document (what everything reads) and the
+    // flat columns (what the admin free-text search indexes). Dotted paths so a
+    // name-only save cannot wipe the certificate URL sitting beside it.
     if (details.businessName !== undefined) {
       $set.businessName = details.businessName;
+      $set['business.name'] = details.businessName;
     }
-    if (details.rcNumber !== undefined) $set.rcNumber = details.rcNumber;
+    if (details.rcNumber !== undefined) {
+      $set.rcNumber = details.rcNumber;
+      $set['business.rcNumber'] = details.rcNumber;
+    }
     if (details.address !== undefined) $set.address = details.address;
+
+    const updated = await this.model
+      .findOneAndUpdate({ userId }, { $set }, { new: true })
+      .exec();
+    return DealerKycMapper.toDomain(updated)!;
+  }
+
+  async saveIdVerification(
+    userId: string,
+    verification: DealerIdVerificationInput,
+  ): Promise<DealerKyc> {
+    await this.ensureForUser(userId);
+
+    // verifiedAt and reference are only written when supplied: a later failed
+    // re-check must not erase the timestamp of a pass that genuinely happened.
+    const $set: Record<string, unknown> = {
+      idVerificationStatus: verification.status,
+    };
+    if (verification.verifiedAt !== undefined) {
+      $set.idVerifiedAt = verification.verifiedAt;
+    }
+    if (verification.reference !== undefined) {
+      $set.idVerificationRef = verification.reference;
+    }
 
     const updated = await this.model
       .findOneAndUpdate({ userId }, { $set }, { new: true })
@@ -169,10 +205,26 @@ export class DealerKycRepositoryImpl implements DealerKycRepository {
     await this.model
       .updateOne({ userId }, { $pull: { kycDocuments: { type: doc.type } } })
       .exec();
+    // The CAC certificate is also the evidence for the business record, so its
+    // URL is copied there. The document row remains the source of truth for
+    // review state; this is only so the file and the typed RC number a reviewer
+    // compares it against can be read together.
+    const $set: Record<string, unknown> =
+      doc.type === KycDocumentType.CAC_CERTIFICATE
+        ? {
+            'business.certificateUrl': doc.url,
+            'business.certificateFilename': doc.filename ?? null,
+            'business.certificateUploadedAt': doc.uploadedAt,
+          }
+        : {};
+
     const updated = await this.model
       .findOneAndUpdate(
         { userId },
-        { $push: { kycDocuments: doc } },
+        {
+          $push: { kycDocuments: doc },
+          ...(Object.keys($set).length ? { $set } : {}),
+        },
         { new: true },
       )
       .exec();

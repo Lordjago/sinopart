@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Full Stack Projects - Portfolio/Sinopart/apps/frontend/importer/src/pages/auth/**)"
+    ]
+  }
+}

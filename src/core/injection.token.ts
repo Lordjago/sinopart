@@ -13,6 +13,9 @@ export const INSPECTION_REPOSITORY = Symbol('INSPECTION_REPOSITORY');
 export const DEALER_KYC_REPOSITORY = Symbol('DEALER_KYC_REPOSITORY');
 export const SAVED_LISTING_REPOSITORY = Symbol('SAVED_LISTING_REPOSITORY');
 export const SETTING_REPOSITORY = Symbol('SETTING_REPOSITORY');
+export const IDENTITY_VERIFICATION_REPOSITORY = Symbol(
+  'IDENTITY_VERIFICATION_REPOSITORY',
+);
 export const ORDER_REPOSITORY = Symbol('ORDER_REPOSITORY');
 
 // ----- Service ports (outbound: the core talking to external services) -----
@@ -21,3 +24,6 @@ export const MAIL_SERVICE = Symbol('MAIL_SERVICE');
 export const MESSAGING_SERVICE = Symbol('MESSAGING_SERVICE');
 export const SMS_SERVICE = Symbol('SMS_SERVICE');
 export const FILE_STORAGE_SERVICE = Symbol('FILE_STORAGE_SERVICE');
+export const IDENTITY_VERIFICATION_SERVICE = Symbol(
+  'IDENTITY_VERIFICATION_SERVICE',
+);

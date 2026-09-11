@@ -55,12 +55,52 @@ export enum DealerIdType {
   NIN = 'nin',
 }
 
+/**
+ * Whether the id above was actually checked against the registry.
+ *
+ * Separate from DealerKycStatus on purpose: this answers "is the number real
+ * and does it belong to this person", while the status answers "has the back
+ * office approved the whole application". A dealer can be identity-VERIFIED and
+ * still sitting in REVIEW because a utility bill has not been looked at yet.
+ */
+export enum IdVerificationStatus {
+  /** Never checked. The state of every file written before Dojah existed. */
+  UNVERIFIED = 'unverified',
+  /** Registry confirmed the number and the name matched the account. */
+  VERIFIED = 'verified',
+  /** Registry knows the number but it belongs to someone else. */
+  MISMATCH = 'mismatch',
+  /** Registry has no such number. */
+  NOT_FOUND = 'not_found',
+}
+
 /** Where the dealer trades from. Free text: Nigerian addresses do not
  *  normalise cleanly, and a reviewer reads this against the uploaded bill. */
 export interface DealerAddress {
   street: string;
   city: string;
   state: string;
+}
+
+/**
+ * The dealer's registered business, and the CAC certificate backing it.
+ *
+ * Grouped rather than left as loose fields because the three belong together: a
+ * reviewer's job is to check that the name and RC number on the certificate are
+ * the ones typed here, and that comparison is impossible if the file and the
+ * text live in unrelated places. The certificate URL is bound at upload time.
+ *
+ * The certificate's REVIEW STATE is not here — that stays on the KycDocument
+ * row, which is what the admin desk approves and rejects. This carries only
+ * what the business record needs to be self-describing.
+ */
+export interface DealerBusiness {
+  name: string | null;
+  /** CAC registration number, as typed. */
+  rcNumber: string | null;
+  certificateUrl: string | null;
+  certificateFilename: string | null;
+  certificateUploadedAt: Date | null;
 }
 
 export class DealerKyc extends BaseDomain {
@@ -74,10 +114,23 @@ export class DealerKyc extends BaseDomain {
   /** Last 4 of the BVN/NIN, for display. The number itself is encrypted at
    *  rest by the repository and never returned on a read. */
   idLast4?: string | null;
+  /** Result of the last registry check. Every attempt, including the ones that
+   *  failed, is kept in the `identity_verifications` collection. */
+  idVerificationStatus?: IdVerificationStatus | null;
+  /** When the identity last came back VERIFIED. Null if it never has. */
+  idVerifiedAt?: Date | null;
+  /** The provider's id for that check, so a reviewer can trace it upstream. */
+  idVerificationRef?: string | null;
 
   // ----- business ---------------------------------------------------------
+  /** Registered business plus its CAC certificate, grouped. */
+  business?: DealerBusiness | null;
+  /**
+   * @deprecated Read `business.name` / `business.rcNumber` instead. These are
+   * still written so the admin search index keeps working, and still populated
+   * by the mapper for rows saved before `business` existed.
+   */
   businessName?: string | null;
-  /** CAC registration number, as typed. */
   rcNumber?: string | null;
 
   // ----- address ----------------------------------------------------------
@@ -129,7 +182,10 @@ export function hasBlockedDealerDocuments(kyc: DealerKyc): boolean {
 export function missingForSubmission(kyc: DealerKyc): string[] {
   const missing: string[] = [];
   if (!kyc.idLast4) missing.push('identity');
-  if (!kyc.rcNumber) missing.push('business');
+  // The RC number is what makes the business step complete; the name alone is
+  // not enough to look a company up. Falls back to the flat column so files
+  // saved before `business` existed still evaluate correctly.
+  if (!(kyc.business?.rcNumber ?? kyc.rcNumber)) missing.push('business');
   if (!kyc.address?.street || !kyc.address?.city || !kyc.address?.state) {
     missing.push('address');
   }

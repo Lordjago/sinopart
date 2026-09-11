@@ -5,6 +5,7 @@ import { JwtModule } from '@nestjs/jwt';
 import {
   AUTHENTICATION_SERVICE,
   FILE_STORAGE_SERVICE,
+  IDENTITY_VERIFICATION_SERVICE,
   MAIL_SERVICE,
   MESSAGING_SERVICE,
   SMS_SERVICE,
@@ -14,6 +15,7 @@ import { SendByteMailServiceImpl } from './mail/sendbyte.mail.service.impl';
 import { SlackNotificationServiceImpl } from './slack/slack.notification.service.impl';
 import { ConsoleSmsServiceImpl } from './sms/console.sms.service.impl';
 import { CloudinaryStorageServiceImpl } from './storage/cloudinary.storage.service.impl';
+import { DojahIdentityServiceImpl } from './identity/dojah.identity.service.impl';
 import { FieldCipher } from './crypto/field-cipher';
 
 @Module({
@@ -52,6 +54,16 @@ import { FieldCipher } from './crypto/field-cipher';
     },
     { provide: SMS_SERVICE, useClass: ConsoleSmsServiceImpl },
     {
+      provide: IDENTITY_VERIFICATION_SERVICE,
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) =>
+        new DojahIdentityServiceImpl({
+          appId: config.getOrThrow<string>('DOJAH_APP_ID'),
+          privateKey: config.getOrThrow<string>('DOJAH_PRIVATE_KEY'),
+          baseUrl: config.getOrThrow<string>('DOJAH_BASE_URL'),
+        }),
+    },
+    {
       provide: FILE_STORAGE_SERVICE,
       inject: [ConfigService],
       useFactory: (config: ConfigService) =>
@@ -63,10 +75,10 @@ import { FieldCipher } from './crypto/field-cipher';
       provide: FieldCipher,
       inject: [ConfigService],
       useFactory: (config: ConfigService) =>
-        new FieldCipher(
-          config.get<string>('ENCRYPTION_KEY') ??
-            config.getOrThrow<string>('JWT_SECRET'),
-        ),
+        // No JWT_SECRET fallback any more: ENCRYPTION_KEY is validated at
+        // boot, and silently keying ciphertext off the JWT secret meant
+        // rotating that secret destroyed every stored BVN.
+        new FieldCipher(config.getOrThrow<string>('ENCRYPTION_KEY')),
     },
   ],
   exports: [
@@ -75,6 +87,7 @@ import { FieldCipher } from './crypto/field-cipher';
     MESSAGING_SERVICE,
     SMS_SERVICE,
     FILE_STORAGE_SERVICE,
+    IDENTITY_VERIFICATION_SERVICE,
     FieldCipher,
     JwtModule,
   ],

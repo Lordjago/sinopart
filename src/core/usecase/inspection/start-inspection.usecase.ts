@@ -43,6 +43,7 @@ import {
 import { ListingStatus, type Listing } from '../../domain/entities/listing';
 import { ResourceNotFoundError } from '../../errors/resource-not-found.error';
 import { ValidationError } from '../../errors/validation.error';
+import { requireVerifiedDealer } from '../dealer-kyc/require-verified-dealer';
 import { SettingsService } from '../config/settings.service';
 
 export interface StartInspectionInput {
@@ -72,6 +73,11 @@ export class StartInspectionUseCase extends BaseUseCase<
   }
 
   async execute(input: StartInspectionInput): Promise<Inspection> {
+    // Before anything else: this is the point money is committed, so an
+    // unverified dealer stops here rather than after a listing read and a fee
+    // calculation. Read the row, not the token — see requireVerifiedDealer.
+    requireVerifiedDealer(await this.users.findById(input.buyerId));
+
     const listing = await this.listings.findById(input.listingId);
     if (!listing) throw new ResourceNotFoundError('Car not found.');
 
